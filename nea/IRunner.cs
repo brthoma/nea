@@ -1,0 +1,207 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace nea
+{
+
+    public interface IRunner
+    {
+        void Run(IConfiguration config);
+    }
+
+
+    public class ClassifierTestRunner : IRunner
+    {
+
+        private const string DICTIONARYFILEPATH = "C:\\Users\\betha\\Code\\nea\\nea\\EnglishDictionary.txt";
+
+        public void Run(IConfiguration config)
+        {
+            Random random = new Random();
+
+            WordsFromDict dataGenerator = new WordsFromDict();
+            TestResultsStore resultsStore = new TestResultsStore();
+
+            ICipher cipher;
+            IClassifier classifier;
+
+            double[] results = new double[config.GetInt("iterations")];
+            bool[] trueValues = new bool[config.GetInt("iterations")];
+
+            switch (config.GetStr("cipher"))
+            {
+                case "XOR":
+                    cipher = new XOR();
+                    break;
+                case "ROT47":
+                    cipher = new ROT47();
+                    break;
+                case "ROT13":
+                    cipher = new ROT13();
+                    break;
+                case "Vigenere":
+                    cipher = new Vigenere();
+                    break;
+                default:
+                    throw new Exception("No valid cipher selected");
+            }
+            switch (config.GetStr("classifier"))
+            {
+                case "RandomGuesser":
+                    classifier = new RandomGuesser();
+                    break;
+                case "ProportionPrintable":
+                    classifier = new ProportionPrintable();
+                    break;
+                case "DictionaryLookup":
+                    classifier = new DictionaryLookup();
+                    break;
+                case "FrequencyAnalysis":
+                    classifier = new FrequencyAnalysis();
+                    break;
+                case "Entropy":
+                    classifier = new Entropy();
+                    break;
+                default:
+                    throw new Exception("No valid classifier selected");
+            }
+
+            for (int i = 0; i < config.GetInt("iterations"); i++)
+            {
+                string text = dataGenerator.GenerateData(DICTIONARYFILEPATH, random, config.GetInt("textLength"));
+                if (random.Next(2) == 0)
+                {
+                    text = cipher.Encrypt(text, cipher.GetRandomKey(random));
+                    Console.WriteLine("Not English");
+                    trueValues[i] = false;
+                }
+                else
+                {
+                    Console.WriteLine("English");
+                    trueValues[i] = true;
+                }
+                results[i] = classifier.Classify(text);
+            }
+
+            resultsStore.SaveResults(config, results, trueValues);
+        }
+
+    }
+
+    public class DemoRunner : IRunner
+    {
+        private const string DICTIONARYFILEPATH = "C:\\Users\\betha\\Code\\nea\\nea\\EnglishDictionary.txt";
+
+        public void Run(IConfiguration config)
+        {
+            Random random = new Random();
+
+            WordsFromDict dataGenerator = new WordsFromDict();
+            DemoResultsStore resultsStore = new DemoResultsStore();
+
+            ICipher cipher;
+            IClassifier classifier;
+            ICryptanalysis cryptanalysis = new ROT13Cryptanalysis(); //JUST FOR NOW WHILE I ONLY HAVE ONE
+
+            double[] results = new double[config.GetInt("iterations")];
+            bool[] trueValues = new bool[config.GetInt("iterations")];
+
+            switch (config.GetStr("cipher"))
+            {
+                case "XOR":
+                    cipher = new XOR();
+                    break;
+                case "ROT47":
+                    cipher = new ROT47();
+                    break;
+                case "ROT13":
+                    cipher = new ROT13();
+                    cryptanalysis = new ROT13Cryptanalysis();
+                    break;
+                case "Vigenere":
+                    cipher = new Vigenere();
+                    break;
+                default:
+                    throw new Exception("No valid cipher selected");
+            }
+            switch (config.GetStr("classifier"))
+            {
+                case "RandomGuesser":
+                    classifier = new RandomGuesser();
+                    break;
+                case "ProportionPrintable":
+                    classifier = new ProportionPrintable();
+                    break;
+                case "DictionaryLookup":
+                    classifier = new DictionaryLookup();
+                    break;
+                case "FrequencyAnalysis":
+                    classifier = new FrequencyAnalysis();
+                    break;
+                case "Entropy":
+                    classifier = new Entropy();
+                    break;
+                default:
+                    throw new Exception("No valid classifier selected");
+            }
+
+            bool[] success = new bool[config.GetInt("iterations")];
+
+            for (int i = 0; i < config.GetInt("iterations"); i++)
+            {
+                string plaintext = dataGenerator.GenerateData(DICTIONARYFILEPATH, random, config.GetInt("textLength"));
+                string ciphertext = cipher.Encrypt(plaintext, cipher.GetRandomKey(random));
+                string likelyPlaintext;
+                success[i] = false;
+
+                foreach (byte[] key in cryptanalysis.GetKeys(ciphertext))
+                {
+                    likelyPlaintext = cipher.Decrypt(ciphertext, key);
+                    if (classifier.Classify(likelyPlaintext) >= config.GetDouble("threshold"))
+                    {
+                        if (likelyPlaintext == plaintext) success[i] = true;
+                        break;
+                    }
+                }
+            }
+
+            resultsStore.SaveResults(config, success);
+        }
+    }
+
+    public class ViewTestResultsRunner : IRunner
+    {
+        public void Run(IConfiguration config)
+        {
+            TestResultsStore resultsStore = new TestResultsStore();
+            ThresholdSuccessGraph thresholdSuccessGraph = new ThresholdSuccessGraph();
+            ROCCurve rocCurve = new ROCCurve();
+            DETCurve detCurve = new DETCurve();
+
+            (double[] results, bool[] trueValues) = resultsStore.GetResults(config.GetStr("filePath"));
+
+            thresholdSuccessGraph.Display(config);
+            rocCurve.Display(config);
+            detCurve.Display(config);
+        }
+    }
+
+    public class ViewDemoResultsRunner : IRunner
+    {
+        public void Run(IConfiguration config)
+        {
+            DemoResultsStore resultsStore = new DemoResultsStore();
+            PrintSuccessRate printSuccess = new PrintSuccessRate();
+
+            bool[] success = resultsStore.GetResults(config.GetStr("filePath"));
+
+            printSuccess.Display(config);
+        }
+    }
+
+
+}
