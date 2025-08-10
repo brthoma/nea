@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
@@ -123,6 +124,7 @@ namespace nea
             IDataGenerator dataGenerator;
             ICipher cipher;
             IClassifier classifier;
+            ICryptanalysis cryptanalysis;
 
             double[] results = new double[config.GetInt("iterations")];
             bool[] trueValues = new bool[config.GetInt("iterations")];
@@ -187,7 +189,29 @@ namespace nea
 
             for (int i = 0; i < config.GetInt("iterations"); i++)
             {
-                ICryptanalysis cryptanalysis = new VigenereCryptanalysis(); //JUST FOR NOW WHILE I ONLY HAVE ONE
+                switch (config.GetStr("cryptanalysis"))
+                {
+                    case "XORCryptanalysis":
+                        throw new NotImplementedException();
+                        break;
+                    case "ROT47Cryptanalysis":
+                        cryptanalysis = new ROT47Cryptanalysis();
+                        break;
+                    case "ROT13Cryptanalysis":
+                        cryptanalysis = new ROT13Cryptanalysis();
+                        break;
+                    case "FasterROT13Cryptanalysis":
+                        cryptanalysis = new FasterROT13Cryptanalysis();
+                        break;
+                    case "VigenereCryptanalysis":
+                        cryptanalysis = new VigenereCryptanalysis();
+                        break;
+                    case "SubstitutionCryptanalysis":
+                        throw new NotImplementedException();
+                        break;
+                    default:
+                        throw new Exception("No valid cryptanalysis selected");
+                }
                 string plaintext = dataGenerator.GenerateData(DICTIONARYFILEPATH, random, config.GetInt("textLength"));
                 string ciphertext = cipher.Encrypt(plaintext, cipher.GetRandomKey(random));
                 string likelyPlaintext;
@@ -226,7 +250,6 @@ namespace nea
 
         public void Run(IConfiguration[] configs)
         {
-            TestResultsStore resultsStore = new TestResultsStore();
             ThresholdSuccessGraph thresholdSuccessGraph = new ThresholdSuccessGraph();
             ROCCurve rocCurve = new ROCCurve();
             DETCurve detCurve = new DETCurve();
@@ -241,25 +264,24 @@ namespace nea
     {
         public void Run(IConfiguration config)
         {
-            DemoResultsStore resultsStore = new DemoResultsStore();
-            PrintSuccessRate printSuccess = new PrintSuccessRate();
-
-            bool[] success = resultsStore.GetResults(config.GetStr("filePath"));
+            ShowSuccessRate printSuccess = new ShowSuccessRate();
 
             printSuccess.Display(new IConfiguration[] { config });
+
+            Console.WriteLine();
+            Console.WriteLine("Press any key to continue: ");
+            Console.ReadKey();
         }
 
         public void Run(IConfiguration[] configs)
         {
-            DemoResultsStore resultsStore = new DemoResultsStore();
-            PrintSuccessRate printSuccess = new PrintSuccessRate();
+            ShowSuccessRate printSuccess = new ShowSuccessRate();
 
-            foreach (IConfiguration config in configs)
-            {
-                bool[] success = resultsStore.GetResults(config.GetStr("filePath"));
+            printSuccess.Display(configs);
 
-                printSuccess.Display(new IConfiguration[] { config });
-            }
+            Console.WriteLine();
+            Console.WriteLine("Press any key to continue: ");
+            Console.ReadKey();
         }
     }
 

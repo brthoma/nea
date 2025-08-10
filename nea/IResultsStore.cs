@@ -31,6 +31,11 @@ namespace nea
                 foreach (bool trueValue in trueValues) sw.Write(trueValue + "|");
                 sw.Close();
             }
+            using (StreamWriter sw = new StreamWriter("C:\\Users\\betha\\Code\\nea\\nea\\TestFiles.txt", true))
+            {
+                sw.WriteLine(DateTime.Now.ToString() + " | " + config.GetStr("filePath"));
+                sw.Close();
+            }
         }
 
         public (double[], bool[]) GetResults(string filePath)
@@ -84,8 +89,14 @@ namespace nea
         {
             using(StreamWriter sw = new StreamWriter(config.GetStr("filePath")))
             {
-                sw.WriteLine($"{config.GetInt("textLength")}|{config.GetInt("iterations")}|{config.GetDouble("threshold")}|{config.GetStr("dataGenerator")}|{config.GetStr("cipher")}|{config.GetStr("classifier")}");
+                sw.WriteLine($"{config.GetInt("textLength")}|{config.GetInt("iterations")}|{config.GetDouble("threshold")}|{config.GetStr("dataGenerator")}|{config.GetStr("cipher")}|{config.GetStr("classifier")}|{config.GetStr("cryptanalysis")}");
                 foreach (bool i in success) sw.Write(i + "|");
+                sw.Close();
+            }
+
+            using(StreamWriter sw = new StreamWriter("C:\\Users\\betha\\Code\\nea\\nea\\DemoFiles.txt", true))
+            {
+                sw.WriteLine(DateTime.Now.ToString() + " | " + config.GetStr("filePath"));
                 sw.Close();
             }
         }
@@ -122,8 +133,9 @@ namespace nea
             string dataGenerator = configInfo[3];
             string cipher = configInfo[4];
             string classifier = configInfo[5];
+            string cryptanalysis = configInfo[6];
 
-            DemoConfiguration config = new DemoConfiguration(filePath, textLength, iterations, threshold, dataGenerator, cipher, classifier);
+            DemoConfiguration config = new DemoConfiguration(filePath, textLength, iterations, threshold, dataGenerator, cipher, classifier, cryptanalysis);
 
             return config;
         }

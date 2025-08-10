@@ -55,7 +55,8 @@ namespace nea
                 {
                     x = thresholds,
                     y = successRates,
-                    mode = "match"
+                    mode = "match",
+                    name = configs[i].GetStr("filePath")
                 };
 
                 scatterPlots[i] = scatter;
@@ -130,7 +131,8 @@ namespace nea
                 {
                     x = falsePositiveRate,
                     y = truePositiveRate,
-                    mode = "match"
+                    mode = "match",
+                    name = configs[i].GetStr("filePath")
                 };
 
                 scatterPlots[i] = scatter;
@@ -203,7 +205,8 @@ namespace nea
                 {
                     x = falsePositiveRate,
                     y = falseNegativeRate,
-                    mode = "match"
+                    mode = "match",
+                    name = configs[i].GetStr("filePath")
                 };
 
                 scatterPlots[i] = scatter;
@@ -217,18 +220,28 @@ namespace nea
 
     }
 
-    public class PrintSuccessRate : IDisplayGraph
+    public class ShowSuccessRate : IDisplayGraph
     {
         public void Display(IConfiguration[] configs)
         {
             DemoResultsStore resultsStore = new DemoResultsStore();
+            string[] xAxis = new string[configs.Length];
+            double[] yAxis = new double[configs.Length];
 
-            foreach (IConfiguration config in configs)
+            for (int i = 0; i < configs.Length; i++)
             {
-                bool[] success = resultsStore.GetResults(config.GetStr("filePath"));
+                bool[] success = resultsStore.GetResults(configs[i].GetStr("filePath"));
+                xAxis[i] = configs[i].GetStr("filePath");
+                yAxis[i] = (double)success.Count(b => b) / success.Length;
 
-                Console.WriteLine($"Success rate: {(double)success.Count(b => b) / success.Length}");
+                //Console.WriteLine($"File name: {configs[i].GetStr("filePath")} | Success rate: {(double)success.Count(b => b) / success.Length}");
             }
+            var barchart = Chart.Plot(new Bar()
+            {
+                x = xAxis,
+                y = yAxis
+            });
+            barchart.Show();
         }
     }
 

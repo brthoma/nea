@@ -24,23 +24,17 @@ namespace nea
 
         public TestConfiguration()
         {
-            Console.Write("Enter file name: ");
-            filePath = Console.ReadLine() + ".txt";
+            filePath = UI.GetStringInput("Enter file name: ") + ".txt";
 
-            Console.Write("Enter text length: ");
-            textLength = int.Parse(Console.ReadLine());
+            textLength = UI.GetIntInput("Enter text length: ");
 
-            Console.Write("Enter number of iterations: ");
-            iterations = int.Parse(Console.ReadLine());
+            iterations = UI.GetIntInput("Enter number of iterations: ");
 
-            Console.Write("Enter data generator: ");
-            dataGenerator = Console.ReadLine();
+            dataGenerator = UI.GetChoice(new string[] {"WordsFromDict"}, "Choose data generator: ");
 
-            Console.Write("Enter cipher: ");
-            cipher = Console.ReadLine();
+            cipher = UI.GetChoice(new string[] { "XOR", "ROT47", "ROT13", "Vigenere", "Substitution" }, "Choose cipher: ");
 
-            Console.Write("Enter classifier: ");
-            classifier = Console.ReadLine();
+            classifier = UI.GetChoice(new string[] { "RandomGuesser", "ProportionPrintable", "DictionaryLookup", "FrequencyAnalysis", "Entropy", "MajorityVoteEnsemble" }, "Choose classifier: ");
         }
 
         public TestConfiguration(string filePath, int textLength, int iterations, string dataGenerator, string cipher, string classifier)
@@ -95,35 +89,48 @@ namespace nea
 
     public class DemoConfiguration : IConfiguration
     {
-        private string filePath, dataGenerator, cipher, classifier;
+        private string filePath, dataGenerator, cipher, classifier, cryptanalysis;
         private int textLength, iterations;
         private double threshold;
 
         public DemoConfiguration()
         {
-            Console.Write("Enter file name: ");
-            filePath = Console.ReadLine() + ".txt";
+            filePath = UI.GetStringInput("Enter file name: ") + ".txt";
 
-            Console.Write("Enter text length: ");
-            textLength = int.Parse(Console.ReadLine());
+            textLength = UI.GetIntInput("Enter text length: ");
 
-            Console.Write("Enter number of iterations: ");
-            iterations = int.Parse(Console.ReadLine());
+            iterations = UI.GetIntInput("Enter number of iterations: ");
 
-            Console.Write("Enter threshold: ");
-            threshold = double.Parse(Console.ReadLine());
+            threshold = UI.GetDoubleInput("Enter classifier threshold to use: ");
 
-            Console.Write("Enter data generator: ");
-            dataGenerator = Console.ReadLine();
+            dataGenerator = UI.GetChoice(new string[] { "WordsFromDict" }, "Choose data generator: ");
 
-            Console.Write("Enter cipher: ");
-            cipher = Console.ReadLine();
+            cipher = UI.GetChoice(new string[] { "XOR", "ROT47", "ROT13", "Vigenere", "Substitution" }, "Choose cipher: ");
 
-            Console.Write("Enter classifier: ");
-            classifier = Console.ReadLine();
+            classifier = UI.GetChoice(new string[] { "RandomGuesser", "ProportionPrintable", "DictionaryLookup", "FrequencyAnalysis", "Entropy", "MajorityVoteEnsemble" }, "Choose classifier: ");
+
+            string cryptanalysisMessage = "Choose cryptanalysis method: ";
+            switch (cipher)
+            {
+                case "XOR":
+                    cryptanalysis = UI.GetChoice(new string[] { "XORCryptanalysis" }, cryptanalysisMessage);
+                    break;
+                case "ROT47":
+                    cryptanalysis = UI.GetChoice(new string[] {"ROT47Cryptanalysis"}, cryptanalysisMessage);
+                    break;
+                case "ROT13":
+                    cryptanalysis = UI.GetChoice(new string[] { "ROT13Cryptanalysis", "FasterROT13Cryptanalysis" }, cryptanalysisMessage);
+                    break;
+                case "Vigenere":
+                    cryptanalysis = UI.GetChoice(new string[] { "VigenereCryptanalysis" }, cryptanalysisMessage);
+                    break;
+                case "Substitution":
+                    cryptanalysis = UI.GetChoice(new string[] { "SubstitutionCryptanalysis" }, cryptanalysisMessage);
+                    break;
+            }
         }
 
-        public DemoConfiguration(string filePath, int textLength, int iterations, double threshold, string dataGenerator, string cipher, string classifier)
+        public DemoConfiguration(string filePath, int textLength, int iterations, double threshold, string dataGenerator, string cipher, string classifier, string cryptanalysis)
         {
             this.filePath = filePath;
             this.textLength = textLength;
@@ -132,6 +139,7 @@ namespace nea
             this.dataGenerator = dataGenerator;
             this.cipher = cipher;
             this.classifier = classifier;
+            this.cryptanalysis = cryptanalysis;
         }
 
         public string GetStr(string property)
@@ -146,6 +154,9 @@ namespace nea
                     return cipher;
                 case "classifier":
                     return classifier;
+                case "cryptanalysis":
+                    return cryptanalysis;
+                    break;
                 default:
                     throw new Exception($"No such string property as '{property}'");
             }
