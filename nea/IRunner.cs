@@ -23,15 +23,24 @@ namespace nea
         {
             Random random = new Random();
 
-            WordsFromDict dataGenerator = new WordsFromDict();
             TestResultsStore resultsStore = new TestResultsStore();
 
+            IDataGenerator dataGenerator;
             ICipher cipher;
             IClassifier classifier;
 
             double[] results = new double[config.GetInt("iterations")];
             bool[] trueValues = new bool[config.GetInt("iterations")];
 
+            switch (config.GetStr("dataGenerator"))
+            {
+                case "WordsFromDict":
+                    dataGenerator = new WordsFromDict();
+                    break;
+                default:
+                    throw new Exception("No valid data generator selected");
+            }
+            
             switch (config.GetStr("cipher"))
             {
                 case "XOR":
@@ -46,9 +55,13 @@ namespace nea
                 case "Vigenere":
                     cipher = new Vigenere();
                     break;
+                case "Substitution":
+                    cipher = new Substitution();
+                    break;
                 default:
                     throw new Exception("No valid cipher selected");
             }
+
             switch (config.GetStr("classifier"))
             {
                 case "RandomGuesser":
@@ -65,6 +78,11 @@ namespace nea
                     break;
                 case "Entropy":
                     classifier = new Entropy();
+                    break;
+                case "MajorityVoteEnsemble":
+                    IClassifier[] classifiers = new IClassifier[] { new RandomGuesser(), new ProportionPrintable(), new DictionaryLookup(), new FrequencyAnalysis(), new Entropy() };
+                    MajVoting trainer = new MajVoting();
+                    classifier = new Ensemble(classifiers, trainer.GetWeights(classifiers, cipher));
                     break;
                 default:
                     throw new Exception("No valid classifier selected");
@@ -100,15 +118,23 @@ namespace nea
         {
             Random random = new Random();
 
-            WordsFromDict dataGenerator = new WordsFromDict();
             DemoResultsStore resultsStore = new DemoResultsStore();
 
+            IDataGenerator dataGenerator;
             ICipher cipher;
             IClassifier classifier;
-            ICryptanalysis cryptanalysis = new ROT13Cryptanalysis(); //JUST FOR NOW WHILE I ONLY HAVE ONE
 
             double[] results = new double[config.GetInt("iterations")];
             bool[] trueValues = new bool[config.GetInt("iterations")];
+
+            switch (config.GetStr("dataGenerator"))
+            {
+                case "WordsFromDict":
+                    dataGenerator = new WordsFromDict();
+                    break;
+                default:
+                    throw new Exception("No valid data generator selected");
+            }
 
             switch (config.GetStr("cipher"))
             {
@@ -120,14 +146,17 @@ namespace nea
                     break;
                 case "ROT13":
                     cipher = new ROT13();
-                    cryptanalysis = new ROT13Cryptanalysis();
                     break;
                 case "Vigenere":
                     cipher = new Vigenere();
                     break;
+                case "Substitution":
+                    cipher = new Substitution();
+                    break;
                 default:
                     throw new Exception("No valid cipher selected");
             }
+
             switch (config.GetStr("classifier"))
             {
                 case "RandomGuesser":
@@ -145,6 +174,11 @@ namespace nea
                 case "Entropy":
                     classifier = new Entropy();
                     break;
+                case "MajorityVoteEnsemble":
+                    IClassifier[] classifiers = new IClassifier[] { new RandomGuesser(), new ProportionPrintable(), new DictionaryLookup(), new FrequencyAnalysis(), new Entropy() };
+                    MajVoting trainer = new MajVoting();
+                    classifier = new Ensemble(classifiers, trainer.GetWeights(classifiers, cipher));
+                    break;
                 default:
                     throw new Exception("No valid classifier selected");
             }
@@ -153,6 +187,7 @@ namespace nea
 
             for (int i = 0; i < config.GetInt("iterations"); i++)
             {
+                ICryptanalysis cryptanalysis = new VigenereCryptanalysis(); //JUST FOR NOW WHILE I ONLY HAVE ONE
                 string plaintext = dataGenerator.GenerateData(DICTIONARYFILEPATH, random, config.GetInt("textLength"));
                 string ciphertext = cipher.Encrypt(plaintext, cipher.GetRandomKey(random));
                 string likelyPlaintext;
@@ -184,9 +219,21 @@ namespace nea
 
             (double[] results, bool[] trueValues) = resultsStore.GetResults(config.GetStr("filePath"));
 
-            thresholdSuccessGraph.Display(config);
-            rocCurve.Display(config);
-            detCurve.Display(config);
+            thresholdSuccessGraph.Display(new IConfiguration[] { config });
+            rocCurve.Display(new IConfiguration[] { config });
+            detCurve.Display(new IConfiguration[] { config });
+        }
+
+        public void Run(IConfiguration[] configs)
+        {
+            TestResultsStore resultsStore = new TestResultsStore();
+            ThresholdSuccessGraph thresholdSuccessGraph = new ThresholdSuccessGraph();
+            ROCCurve rocCurve = new ROCCurve();
+            DETCurve detCurve = new DETCurve();
+
+            thresholdSuccessGraph.Display(configs);
+            rocCurve.Display(configs);
+            detCurve.Display(configs);
         }
     }
 
@@ -199,7 +246,20 @@ namespace nea
 
             bool[] success = resultsStore.GetResults(config.GetStr("filePath"));
 
-            printSuccess.Display(config);
+            printSuccess.Display(new IConfiguration[] { config });
+        }
+
+        public void Run(IConfiguration[] configs)
+        {
+            DemoResultsStore resultsStore = new DemoResultsStore();
+            PrintSuccessRate printSuccess = new PrintSuccessRate();
+
+            foreach (IConfiguration config in configs)
+            {
+                bool[] success = resultsStore.GetResults(config.GetStr("filePath"));
+
+                printSuccess.Display(new IConfiguration[] { config });
+            }
         }
     }
 

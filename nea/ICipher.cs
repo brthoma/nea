@@ -96,7 +96,7 @@ namespace nea
 
         public string Decrypt(string ciphertext, byte[] bKey)
         {
-            int key = (RANGE + 1 - BitConverter.ToInt32(bKey, 0)) % (RANGE + 1);
+            int key = (RANGE + 1 - (BitConverter.ToInt32(bKey, 0) % (RANGE + 1))) % (RANGE + 1);
             return Encrypt(ciphertext, BitConverter.GetBytes(key));
         }
 
@@ -139,7 +139,7 @@ namespace nea
 
         public string Decrypt(string ciphertext, byte[] bKey)
         {
-            int key = (RANGE + 1 - BitConverter.ToInt32(bKey, 0)) % (RANGE + 1);
+            int key = (RANGE + 1 - (BitConverter.ToInt32(bKey, 0) % (RANGE + 1))) % (RANGE + 1);
             return Encrypt(ciphertext, BitConverter.GetBytes(key));
         }
 

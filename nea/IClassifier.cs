@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Text.RegularExpressions;
 
 namespace nea
 {
@@ -230,6 +229,31 @@ namespace nea
             else probability = 1 - (entropy - CLOSETOENGLISH) / (MAXENTROPY - CLOSETOENGLISH);
 
             return probability;
+        }
+
+    }
+
+    public class Ensemble : IClassifier
+    {
+        private IClassifier[] classifiers;
+        private double[] weights;
+
+        public Ensemble(IClassifier[] classifiers, double[] weights)
+        {
+            this.classifiers = classifiers;
+            this.weights = weights;
+        }
+
+        public double Classify(string text)
+        {
+            double weightedAverage = 0;
+
+            for (int i = 0; i < classifiers.Length; i++)
+            {
+                weightedAverage += weights[i] * classifiers[i].Classify(text);
+            }
+
+            return weightedAverage;
         }
 
     }

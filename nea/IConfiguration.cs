@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.SqlServer.Server;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,7 +19,7 @@ namespace nea
     public class TestConfiguration : IConfiguration
     {
 
-        private string filePath, cipher, classifier;
+        private string filePath, dataGenerator, cipher, classifier;
         private int textLength, iterations;
 
         public TestConfiguration()
@@ -32,11 +33,24 @@ namespace nea
             Console.Write("Enter number of iterations: ");
             iterations = int.Parse(Console.ReadLine());
 
+            Console.Write("Enter data generator: ");
+            dataGenerator = Console.ReadLine();
+
             Console.Write("Enter cipher: ");
             cipher = Console.ReadLine();
 
             Console.Write("Enter classifier: ");
             classifier = Console.ReadLine();
+        }
+
+        public TestConfiguration(string filePath, int textLength, int iterations, string dataGenerator, string cipher, string classifier)
+        {
+            this.filePath = filePath;
+            this.textLength = textLength;
+            this.iterations = iterations;
+            this.dataGenerator = dataGenerator;
+            this.cipher = cipher;
+            this.classifier = classifier;
         }
 
         public string GetStr(string property)
@@ -45,6 +59,8 @@ namespace nea
             {
                 case "filePath":
                     return filePath;
+                case "dataGenerator":
+                    return dataGenerator;
                 case "cipher":
                     return cipher;
                 case "classifier":
@@ -79,7 +95,7 @@ namespace nea
 
     public class DemoConfiguration : IConfiguration
     {
-        private string filePath, cipher, classifier;
+        private string filePath, dataGenerator, cipher, classifier;
         private int textLength, iterations;
         private double threshold;
 
@@ -97,11 +113,25 @@ namespace nea
             Console.Write("Enter threshold: ");
             threshold = double.Parse(Console.ReadLine());
 
+            Console.Write("Enter data generator: ");
+            dataGenerator = Console.ReadLine();
+
             Console.Write("Enter cipher: ");
             cipher = Console.ReadLine();
 
             Console.Write("Enter classifier: ");
             classifier = Console.ReadLine();
+        }
+
+        public DemoConfiguration(string filePath, int textLength, int iterations, double threshold, string dataGenerator, string cipher, string classifier)
+        {
+            this.filePath = filePath;
+            this.textLength = textLength;
+            this.iterations = iterations;
+            this.threshold = threshold;
+            this.dataGenerator = dataGenerator;
+            this.cipher = cipher;
+            this.classifier = classifier;
         }
 
         public string GetStr(string property)
@@ -110,6 +140,8 @@ namespace nea
             {
                 case "filePath":
                     return filePath;
+                case "dataGenerator":
+                    return dataGenerator;
                 case "cipher":
                     return cipher;
                 case "classifier":

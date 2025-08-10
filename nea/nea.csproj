@@ -58,19 +58,23 @@
     <Compile Include="ICryptanalysis.cs" />
     <Compile Include="IDataGenerator.cs" />
     <Compile Include="IDisplayGraph.cs" />
+    <Compile Include="ITrainEnsemble.cs" />
     <Compile Include="IResultsStore.cs" />
     <Compile Include="IRunner.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Stump.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="CipherClassifierSuccess.txt" />
     <Content Include="EnglishDictionary.txt" />
     <Content Include="EnglishLetterDistribution.txt" />
     <Content Include="LookupGammaFunct.txt" />
+    <Content Include="OptimalClassifierThresholds.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

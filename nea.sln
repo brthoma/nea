@@ -5,6 +5,11 @@ VisualStudioVersion = 17.10.35013.160
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nea", "nea\nea.csproj", "{AB69090C-5850-45DA-AC71-C70E695A819F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "neaTest", "neaTest\neaTest.csproj", "{6B6A282D-41D2-495E-BE7B-482F466760CE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AB69090C-5850-45DA-AC71-C70E695A819F} = {AB69090C-5850-45DA-AC71-C70E695A819F}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +20,10 @@ Global
 		{AB69090C-5850-45DA-AC71-C70E695A819F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB69090C-5850-45DA-AC71-C70E695A819F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB69090C-5850-45DA-AC71-C70E695A819F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B6A282D-41D2-495E-BE7B-482F466760CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B6A282D-41D2-495E-BE7B-482F466760CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B6A282D-41D2-495E-BE7B-482F466760CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B6A282D-41D2-495E-BE7B-482F466760CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

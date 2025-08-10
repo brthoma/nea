@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
 using XPlot.Plotly;
@@ -10,7 +11,7 @@ namespace nea
 {
     public interface IDisplayGraph
     {
-        void Display(IConfiguration config);
+        void Display(IConfiguration[] configs);
     }
 
 
@@ -31,30 +32,39 @@ namespace nea
             return (double) success / results.Length;
         }
 
-        public void Display(IConfiguration config)
+        public void Display(IConfiguration[] configs)
         {
             TestResultsStore resultsStore = new TestResultsStore();
 
-            (double[] results, bool[] trueValues) = resultsStore.GetResults(config.GetStr("filePath"));
+            Scatter[] scatterPlots = new Scatter[configs.Length];
 
-            double[] successRates = new double[NUMDATAPOINTS + 1];
-            double[] thresholds = new double[NUMDATAPOINTS + 1];
-
-            for (int i = 0; i <= NUMDATAPOINTS; i ++)
+            for (int i = 0; i < configs.Length; i++)
             {
-                thresholds[i] = (double) i / NUMDATAPOINTS;
-                successRates[i] = GetSuccessAtThreshold(results, trueValues, thresholds[i]);
+                (double[] results, bool[] trueValues) = resultsStore.GetResults(configs[i].GetStr("filePath"));
+
+                double[] successRates = new double[NUMDATAPOINTS + 1];
+                double[] thresholds = new double[NUMDATAPOINTS + 1];
+
+                for (int j = 0; j <= NUMDATAPOINTS; j ++)
+                {
+                    thresholds[j] = (double) j / NUMDATAPOINTS;
+                    successRates[j] = GetSuccessAtThreshold(results, trueValues, thresholds[j]);
+                }
+
+                Scatter scatter = new Scatter()
+                {
+                    x = thresholds,
+                    y = successRates,
+                    mode = "match"
+                };
+
+                scatterPlots[i] = scatter;
             }
 
-            var scatterPlot = Chart.Plot(new Scatter()
-            {
-                x = thresholds,
-                y = successRates,
-                mode = "match"
-            });
-            scatterPlot.WithXTitle("Threshold");
-            scatterPlot.WithYTitle("Success Rate");
-            scatterPlot.Show();
+            PlotlyChart combinedScatterPlot = Chart.Plot(scatterPlots);
+            combinedScatterPlot.WithXTitle("Threshold");
+            combinedScatterPlot.WithYTitle("Success Rate");
+            combinedScatterPlot.Show();
         }
 
     }
@@ -94,33 +104,42 @@ namespace nea
             return ( (double) numFalsePositives / numNegatives, (double) numTruePositives / numPositives );
         }
 
-        public void Display(IConfiguration config)
+        public void Display(IConfiguration[] configs)
         {
             TestResultsStore resultsStore = new TestResultsStore();
 
-            (double[] results, bool[] trueValues) = resultsStore.GetResults(config.GetStr("filePath"));
+            Scatter[] scatterPlots = new Scatter[configs.Length];
 
-            double[] falsePositiveRate = new double[NUMDATAPOINTS + 3];
-            double[] truePositiveRate = new double[NUMDATAPOINTS + 3];
-
-            for (int i = 0; i < falsePositiveRate.Length - 2; i ++)
+            for (int i = 0; i < configs.Length; i++)
             {
-                double threshold = (double) i / NUMDATAPOINTS;
-                (falsePositiveRate[i + 1], truePositiveRate[i + 1]) = GetValuesAtThreshold(results, trueValues, threshold);
-                Console.WriteLine($"{threshold} {falsePositiveRate[i + 1]} {truePositiveRate[i + 1]}");
+                (double[] results, bool[] trueValues) = resultsStore.GetResults(configs[i].GetStr("filePath"));
+
+                double[] falsePositiveRate = new double[NUMDATAPOINTS + 3];
+                double[] truePositiveRate = new double[NUMDATAPOINTS + 3];
+
+                for (int j = 0; j < falsePositiveRate.Length - 2; j++)
+                {
+                    double threshold = (double)j / NUMDATAPOINTS;
+                    (falsePositiveRate[j + 1], truePositiveRate[j + 1]) = GetValuesAtThreshold(results, trueValues, threshold);
+                    Console.WriteLine($"{threshold} {falsePositiveRate[j + 1]} {truePositiveRate[j + 1]}");
+                }
+                (falsePositiveRate[0], truePositiveRate[0]) = (1, 1);
+                (falsePositiveRate[falsePositiveRate.Length - 1], truePositiveRate[truePositiveRate.Length - 1]) = (0, 0);
+
+                Scatter scatter = new Scatter()
+                {
+                    x = falsePositiveRate,
+                    y = truePositiveRate,
+                    mode = "match"
+                };
+
+                scatterPlots[i] = scatter;
             }
-            (falsePositiveRate[0], truePositiveRate[0]) = (1, 1);
-            (falsePositiveRate[falsePositiveRate.Length - 1], truePositiveRate[truePositiveRate.Length - 1]) = (0, 0);
 
-            var scatterPlot = Chart.Plot(new Scatter()
-            {
-                x = falsePositiveRate,
-                y = truePositiveRate,
-                mode = "match"
-            });
-            scatterPlot.WithXTitle("False Positive Rate");
-            scatterPlot.WithYTitle("True Positive Rate");
-            scatterPlot.Show();
+            PlotlyChart combinedScatterPlot = Chart.Plot(scatterPlots);
+            combinedScatterPlot.WithXTitle("False Positive Rate");
+            combinedScatterPlot.WithYTitle("True Positive Rate");
+            combinedScatterPlot.Show();
         }
 
     }
@@ -160,44 +179,56 @@ namespace nea
             return ((double) numFalsePositives / numNegatives, (double) numFalseNegatives / numPositives);
         }
 
-        public void Display(IConfiguration config)
+        public void Display(IConfiguration[] configs)
         {
             TestResultsStore resultsStore = new TestResultsStore();
 
-            (double[] results, bool[] trueValues) = resultsStore.GetResults(config.GetStr("filePath"));
+            Scatter[] scatterPlots = new Scatter[configs.Length];
 
-            double[] falsePositiveRate = new double[NUMDATAPOINTS + 1];
-            double[] falseNegativeRate = new double[NUMDATAPOINTS + 1];
-
-            for (int i = 0; i < falsePositiveRate.Length; i++)
+            for (int i = 0; i < configs.Length; i++)
             {
-                double threshold = (double)i / NUMDATAPOINTS;
-                (falsePositiveRate[i], falseNegativeRate[i]) = GetValuesAtThreshold(results, trueValues, threshold);
-                Console.WriteLine($"{threshold} {falsePositiveRate[i]} {falseNegativeRate[i]}");
+                (double[] results, bool[] trueValues) = resultsStore.GetResults(configs[i].GetStr("filePath"));
+
+                double[] falsePositiveRate = new double[NUMDATAPOINTS + 1];
+                double[] falseNegativeRate = new double[NUMDATAPOINTS + 1];
+
+                for (int j = 0; j < falsePositiveRate.Length; j++)
+                {
+                    double threshold = (double)j / NUMDATAPOINTS;
+                    (falsePositiveRate[j], falseNegativeRate[j]) = GetValuesAtThreshold(results, trueValues, threshold);
+                    Console.WriteLine($"{threshold} {falsePositiveRate[j]} {falseNegativeRate[j]}");
+                }
+
+                Scatter scatter = new Scatter()
+                {
+                    x = falsePositiveRate,
+                    y = falseNegativeRate,
+                    mode = "match"
+                };
+
+                scatterPlots[i] = scatter;
             }
 
-            var scatterPlot = Chart.Plot(new Scatter()
-            {
-                x = falsePositiveRate,
-                y = falseNegativeRate,
-                mode = "match"
-            });
-            scatterPlot.WithXTitle("False Positive Rate");
-            scatterPlot.WithYTitle("False Negative Rate");
-            scatterPlot.Show();
+            PlotlyChart combinedScatterPlot = Chart.Plot(scatterPlots);
+            combinedScatterPlot.WithXTitle("False Positive Rate");
+            combinedScatterPlot.WithYTitle("False Negative Rate");
+            combinedScatterPlot.Show();
         }
 
     }
 
     public class PrintSuccessRate : IDisplayGraph
     {
-        public void Display(IConfiguration config)
+        public void Display(IConfiguration[] configs)
         {
             DemoResultsStore resultsStore = new DemoResultsStore();
 
-            bool[] success = resultsStore.GetResults(config.GetStr("filePath"));
+            foreach (IConfiguration config in configs)
+            {
+                bool[] success = resultsStore.GetResults(config.GetStr("filePath"));
 
-            Console.WriteLine($"Success rate: {(double) success.Count(b => b) / success.Length}");
+                Console.WriteLine($"Success rate: {(double)success.Count(b => b) / success.Length}");
+            }
         }
     }
 

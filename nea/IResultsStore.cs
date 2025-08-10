@@ -14,6 +14,7 @@ namespace nea
     {
         void SaveResults(IConfiguration config, double[] values, bool[] trueValues);
         (double[], bool[]) GetResults(string filePath);
+        IConfiguration GetConfiguration(string filePath);
     }
 
 
@@ -24,7 +25,7 @@ namespace nea
         {
             using (StreamWriter sw = new StreamWriter(config.GetStr("filePath")))
             {
-                sw.WriteLine($"{config.GetStr("cipher")}|{config.GetStr("classifier")}|{config.GetInt("textLength")}|{config.GetInt("iterations")}");
+                sw.WriteLine($"{config.GetInt("textLength")}|{config.GetInt("iterations")}|{config.GetStr("dataGenerator")}|{config.GetStr("cipher")}|{config.GetStr("classifier")}");
                 foreach (double i in values) sw.Write(i + "|");
                 sw.Write("\n");
                 foreach (bool trueValue in trueValues) sw.Write(trueValue + "|");
@@ -56,6 +57,25 @@ namespace nea
             return (results, trueValues);
         }
 
+        public IConfiguration GetConfiguration(string filePath)
+        {
+            string[] configInfo;
+            using (StreamReader sr = new StreamReader(filePath))
+            {
+                configInfo = sr.ReadLine().Trim('|').Split('|');
+                sr.Close();
+            }
+            int textLength = int.Parse(configInfo[0]);
+            int iterations = int.Parse(configInfo[1]);
+            string dataGenerator = configInfo[2];
+            string cipher = configInfo[3];
+            string classifier = configInfo[4];
+
+            TestConfiguration config = new TestConfiguration(filePath, textLength, iterations, dataGenerator, cipher, classifier);
+
+            return config;
+        }
+
     }
     
     public class DemoResultsStore
@@ -64,7 +84,7 @@ namespace nea
         {
             using(StreamWriter sw = new StreamWriter(config.GetStr("filePath")))
             {
-                sw.WriteLine($"{config.GetStr("cipher")}|{config.GetStr("classifier")}|{config.GetInt("textLength")}|{config.GetInt("iterations")}|{config.GetDouble("threshold")}");
+                sw.WriteLine($"{config.GetInt("textLength")}|{config.GetInt("iterations")}|{config.GetDouble("threshold")}|{config.GetStr("dataGenerator")}|{config.GetStr("cipher")}|{config.GetStr("classifier")}");
                 foreach (bool i in success) sw.Write(i + "|");
                 sw.Close();
             }
@@ -87,6 +107,27 @@ namespace nea
 
             return success;
         }
+
+        public IConfiguration GetConfiguration(string filePath)
+        {
+            string[] configInfo;
+            using (StreamReader sr = new StreamReader(filePath))
+            {
+                configInfo = sr.ReadLine().Trim('|').Split('|');
+                sr.Close();
+            }
+            int textLength = int.Parse(configInfo[0]);
+            int iterations = int.Parse(configInfo[1]);
+            double threshold = double.Parse(configInfo[2]);
+            string dataGenerator = configInfo[3];
+            string cipher = configInfo[4];
+            string classifier = configInfo[5];
+
+            DemoConfiguration config = new DemoConfiguration(filePath, textLength, iterations, threshold, dataGenerator, cipher, classifier);
+
+            return config;
+        }
+
     }
 
 
