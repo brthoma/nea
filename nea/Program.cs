@@ -53,7 +53,7 @@ namespace nea
                         TestResultsStore testResultsStore = new TestResultsStore();
                         ViewTestResultsRunner viewTestResultsRunner = new ViewTestResultsRunner();
 
-                        string[] testsInfo = UI.GetChoices(File.ReadAllLines(TESTFILEPATH).Reverse().ToArray(), "Choose file to view: ").ToArray();
+                        string[] testsInfo = UI.GetChoices(File.ReadAllLines(TESTFILEPATH).Reverse().ToArray(), "Choose files to view (Click Done when all have been selected): ").ToArray();
                         IConfiguration[] testConfigs = new IConfiguration[testsInfo.Length];
 
                         for (int i = 0; i < testsInfo.Length; i++)
@@ -70,7 +70,7 @@ namespace nea
                         DemoResultsStore demoResultsStore = new DemoResultsStore();
                         ViewDemoResultsRunner viewDemoResultsRunner = new ViewDemoResultsRunner();
 
-                        string[] demoInfo = UI.GetChoices(File.ReadAllLines(DEMOFILEPATH).Reverse().ToArray(), "Choose file to view: ").ToArray();
+                        string[] demoInfo = UI.GetChoices(File.ReadAllLines(DEMOFILEPATH).Reverse().ToArray(), "Choose files to view (Click Done when all have been selected): ").ToArray();
                         IConfiguration[] demoConfigs = new IConfiguration[demoInfo.Length];
 
                         for (int i = 0; i < demoInfo.Length; i++)
@@ -94,80 +94,6 @@ namespace nea
 
             Console.ReadKey();
 
-
-
-
-
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-            //Vigenere cipher = new Vigenere();
-            //byte[] key = cipher.GetRandomKey(random, 4);
-            //string plaintext = "abcABC xyzXYZ .,!~#!£$%^&*() aaaaaaaaaaaaaa";
-            //string ciphertext = cipher.Encrypt(plaintext, key);
-            //Console.WriteLine(Encoding.UTF8.GetString(key));
-            //Console.WriteLine(plaintext);
-            //Console.WriteLine(ciphertext);
-            //Console.WriteLine(cipher.Decrypt(ciphertext, key));
-            //Console.ReadKey();
-
-            //Entropy entropy = new Entropy();
-            //while (true)
-            //{
-            //    Console.WriteLine("Entropy : " + entropy.Classify(Console.ReadLine()));
-            //}
-
-            //Substitution cipher = new Substitution();
-            //byte[] key = cipher.GetRandomKey(random);
-            //string plaintext = "abcdefghijklmnopqrstuvwxyz! The Quick Brown Fox Jumps Over The Lazy Dog.";
-            //string ciphertext = cipher.Encrypt(plaintext, key);
-            //Console.WriteLine(Encoding.UTF8.GetString(key));
-            //Console.WriteLine(plaintext);
-            //Console.WriteLine(ciphertext);
-            //Console.WriteLine(cipher.Decrypt(ciphertext, key));
-
-            //Console.ReadKey();
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            //DemoConfiguration demoConfig = new DemoConfiguration();
-            //DemoRunner runner = new DemoRunner();
-            //ViewDemoResultsRunner displayResults = new ViewDemoResultsRunner();
-            //WordsFromDict textGen = new WordsFromDict();
-
-            //runner.Run(demoConfig);
-            //displayResults.Run(demoConfig);
-
-            //Console.ReadKey();
-
-
-
-            //WordsFromDict textGenerator = new WordsFromDict();
-
-            //TestConfiguration testConfig = new TestConfiguration();
-            //TestConfiguration testConfig2 = new TestConfiguration();
-            //ClassifierTestRunner testRunner = new ClassifierTestRunner();
-            //ViewTestResultsRunner displayTestResults = new ViewTestResultsRunner();
-
-            //testRunner.Run(testConfig);
-            //testRunner.Run(testConfig2);
-            //displayTestResults.Run(new TestConfiguration[] { testConfig, testConfig2 });
-
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-            //Console.ReadKey();
-
-
-            //TestConfiguration testConfig = new TestConfiguration();
-            //ClassifierTestRunner testRunner = new ClassifierTestRunner();
-            //ViewTestResultsRunner viewResults = new ViewTestResultsRunner();
-
-            //testRunner.Run(testConfig);
-
-            //viewResults.Run(testConfig);
-
-            //Console.ReadKey();
         }
     }
 }
