@@ -10,16 +10,22 @@ namespace nea
 
     public interface IDataGenerator
     {
-        string GenerateData(string dictFilePath, Random random, int length);
+        string GenerateData(Random random, int length);
     }
 
 
     public class WordsFromDict : IDataGenerator
     {
+        private string dictionaryFilePath;
 
-        public string GenerateData(string dictFilePath, Random random, int length)
+        public WordsFromDict(string dictionaryFilePath)
         {
-            string[] dictionary = File.ReadAllLines(dictFilePath);
+            this.dictionaryFilePath = dictionaryFilePath;
+        }
+
+        public string GenerateData(Random random, int length)
+        {
+            string[] dictionary = File.ReadAllLines(dictionaryFilePath);
             string text = "";
 
             do
@@ -28,6 +34,26 @@ namespace nea
             } while (text.Length < length);
 
             return text.Substring(0, length).Trim();
+        }
+
+    }
+
+    public class TextFromCorpus : IDataGenerator
+    {
+        private string corpusFilePath;
+
+        public TextFromCorpus(string corpusFilePath)
+        {
+            this.corpusFilePath = corpusFilePath;
+        }
+
+        public string GenerateData(Random random, int length)
+        {
+            string corpus = File.ReadAllText(corpusFilePath);
+            int randomStart = random.Next(corpus.Length - length);
+            string text = corpus.Substring(randomStart, length);
+
+            return text;
         }
 
     }

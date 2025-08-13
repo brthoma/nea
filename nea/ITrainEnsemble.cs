@@ -87,7 +87,7 @@ public class AdaBoost : ITrainEnsemble
 
         for (int i = 0; i < sampleSize; i++)
         {
-            string text = dataGenerator.GenerateData(DICTIONARYFILEPATH, random, textLength);
+            string text = dataGenerator.GenerateData(random, textLength);
             bool trueValue = true;
 
             if (random.Next(2) == 0)
@@ -162,7 +162,7 @@ public class AdaBoost : ITrainEnsemble
 
     public void Train(IClassifier[] classifiers, ICipher cipher, int sampleSize, int textLength)
     {
-        WordsFromDict dataGenerator = new WordsFromDict();
+        WordsFromDict dataGenerator = new WordsFromDict(DICTIONARYFILEPATH);
 
         Element[] elements = SetUpSamples(dataGenerator, cipher, sampleSize, textLength);
 

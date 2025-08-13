@@ -10,16 +10,11 @@ using Newtonsoft.Json.Linq;
 namespace nea
 {
 
-    public interface IResultsStore
-    {
-        void SaveResults(IConfiguration config, double[] values, bool[] trueValues);
-        (double[], bool[]) GetResults(string filePath);
-        IConfiguration GetConfiguration(string filePath);
-    }
 
-
-    public class TestResultsStore : IResultsStore
+    public class TestResultsStore
     {
+
+        public const string TESTFILES = "C:\\Users\\betha\\Code\\nea\\nea\\TestFiles.txt";
 
         public void SaveResults(IConfiguration config, double[] values, bool[] trueValues)
         {
@@ -31,7 +26,7 @@ namespace nea
                 foreach (bool trueValue in trueValues) sw.Write(trueValue + "|");
                 sw.Close();
             }
-            using (StreamWriter sw = new StreamWriter("C:\\Users\\betha\\Code\\nea\\nea\\TestFiles.txt", true))
+            using (StreamWriter sw = new StreamWriter(TESTFILES, true))
             {
                 sw.WriteLine(DateTime.Now.ToString() + " | " + config.GetStr("filePath"));
                 sw.Close();
@@ -85,6 +80,8 @@ namespace nea
     
     public class DemoResultsStore
     {
+        public const string DEMOFILES = "C:\\Users\\betha\\Code\\nea\\nea\\DemoFiles.txt";
+
         public void SaveResults(IConfiguration config, bool[] success)
         {
             using(StreamWriter sw = new StreamWriter(config.GetStr("filePath")))
@@ -94,7 +91,7 @@ namespace nea
                 sw.Close();
             }
 
-            using(StreamWriter sw = new StreamWriter("C:\\Users\\betha\\Code\\nea\\nea\\DemoFiles.txt", true))
+            using(StreamWriter sw = new StreamWriter(DEMOFILES, true))
             {
                 sw.WriteLine(DateTime.Now.ToString() + " | " + config.GetStr("filePath"));
                 sw.Close();

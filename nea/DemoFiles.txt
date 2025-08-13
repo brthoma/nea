@@ -2,3 +2,7 @@
 10/08/2025 17:31:49 | DemoA2.txt
 10/08/2025 17:33:00 | DemoA3.txt
 10/08/2025 18:28:58 | hgjhg.txt
+11/08/2025 15:16:38 | TestSubstitution.txt
+11/08/2025 15:23:11 | substitution2.txt
+11/08/2025 16:46:02 | TestVigenere.txt
+11/08/2025 16:50:47 | helloworld.py.txt

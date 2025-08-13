@@ -70,7 +70,8 @@ namespace nea
 
     public class FrequencyAnalysis : IClassifier
     {
-
+        private const string GAMMAFUNCTLOOKUP = "C:\\Users\\betha\\Code\\nea\\nea\\LookupGammaFunct.txt";
+        private const string EXPECTEDFREQUENCIES = "C:\\Users\\betha\\Code\\nea\\nea\\EnglishLetterDistribution.txt";
         private const int OPTIMALN = 100;
         private const int LETTERSINALPHABET = 26;
         private const int NUMINTERVALS = 1000;
@@ -79,98 +80,24 @@ namespace nea
 
         public FrequencyAnalysis()
         {
-            using(StreamReader sr = new StreamReader("C:\\Users\\betha\\Code\\nea\\nea\\LookupGammaFunct.txt"))
+            using(StreamReader sr = new StreamReader(GAMMAFUNCTLOOKUP))
             {
                 while (!sr.EndOfStream)
                 {
                     string[] kvp = sr.ReadLine().Trim().Split('|');
                     LookupGammaFunct.Add(double.Parse(kvp[0]), double.Parse(kvp[1]));
                 }
+                sr.Close();
             }
-            using (StreamReader sr = new StreamReader("C:\\Users\\betha\\Code\\nea\\nea\\EnglishLetterDistribution.txt"))
+
+            using (StreamReader sr = new StreamReader(EXPECTEDFREQUENCIES))
             {
                 for (int i = 0; i < LETTERSINALPHABET; i++)
                 {
                     expectedEngDistribution[i] = double.Parse(sr.ReadLine().Trim().Split('|')[1]);
                 }
+                sr.Close();
             }
-        }
-
-        private double ChiSquared(double[] observedFreqs, double[] expectedFreqs)
-        {
-            double chiSquared = 0;
-            for (int i = 0; i < observedFreqs.Length; i++)
-            {
-                chiSquared += Math.Pow(observedFreqs[i] - expectedFreqs[i], 2) / expectedFreqs[i];
-            }
-
-            return chiSquared;
-        }
-
-        private double CDF(int degFreedom, double chiSquared)
-        {
-            //double cdf = ɣ((double)degFreedom / 2, chiSquared / 2) / LookupΓ[(double)degFreedom / 2];
-            double cdf = SimpsonLowerIncompleteGammaFunct((double)degFreedom / 2, chiSquared / 2) / LookupGammaFunct[(double)degFreedom / 2];
-            Console.WriteLine($"degFreedom = {degFreedom}, chiSquared = {chiSquared}; cdf = {cdf}");
-            return cdf;
-        }
-
-        private double LowerIncompleteGammaFunct(double s, double x)
-        {
-            double intervalWidth = x / NUMINTERVALS;
-            double result = 0;
-
-            for (int i = 1; i < NUMINTERVALS; i++)
-            {
-                result += Math.Pow(i * intervalWidth, s - 1) * Math.Pow(Math.E, -i * intervalWidth);
-            }
-            result *= 2;
-            result += NUMINTERVALS * intervalWidth * Math.Pow(Math.E, -intervalWidth);
-            result *= intervalWidth / 2;
-
-            return result;
-        }
-
-        private double f(double s, double x)
-        {
-            return Math.Pow(x, s - 1) * Math.Pow(Math.E, -x);
-        }
-
-        private double SimpsonLowerIncompleteGammaFunct(double s, double x)
-        {
-            double intervalWidth = x / NUMINTERVALS;
-            double result = 0;
-
-            for (int i = 0; i < NUMINTERVALS; i++)
-            {
-                double a = i * intervalWidth;
-                double b = (i + 1) * intervalWidth;
-                result += ((b - a) / 6) * (f(s, a) + 4 * f(s, ((a + b) / 2)) + f(s, b));
-            }
-
-            return result;
-        }
-
-        public (double[], double[]) CombineClasses(double[] observedFreqs, double[] expectedFreqs)
-        {
-            List<double> observedFreqList = observedFreqs.ToList();
-            List<double> expectedFreqList = expectedFreqs.ToList();
-
-            while ((double)expectedFreqList.Min() < 0.05 * OPTIMALN)
-            {
-                double minExpectedFreq = expectedFreqList.Min();
-                int removeAtIdx = expectedFreqList.IndexOf(minExpectedFreq);
-                double minObservedFreq = observedFreqList[removeAtIdx];
-
-                observedFreqList.RemoveAt(removeAtIdx);
-                expectedFreqList.RemoveAt(removeAtIdx);
-
-                int addAtIdx = expectedFreqList.IndexOf(expectedFreqList.Min());
-                expectedFreqList[addAtIdx] += minExpectedFreq;
-                observedFreqList[addAtIdx] += minObservedFreq;
-            }
-
-            return (observedFreqList.ToArray(), expectedFreqList.ToArray());
         }
 
         public double Classify(string text)
@@ -186,13 +113,168 @@ namespace nea
                 observedFreqs[i] = (double) text.Count(c => char.ToLower(c) == (char)('a' + i)) * ((double) OPTIMALN / numLetters);
             }
 
-            (double[] combinedObsFreqs, double[] combinedExpFreqs) = CombineClasses(observedFreqs, expectedFreqs);
+            (double[] combinedObsFreqs, double[] combinedExpFreqs) = Statistics.CombineChiSquaredClasses(observedFreqs, expectedFreqs, OPTIMALN);
 
             int degFreedom = combinedObsFreqs.Length - 1;
             if (degFreedom == 0) throw new Exception("Text too short: insufficient information to classify.");
 
-            return 1 - CDF(degFreedom, ChiSquared(combinedObsFreqs, combinedExpFreqs));
+            double pValue = Statistics.GetPValue(combinedObsFreqs, combinedExpFreqs, degFreedom, NUMINTERVALS, LookupGammaFunct);
+
+            return pValue;
         }
+
+    }
+
+    public class WordLength : IClassifier
+    {
+        private const string GAMMAFUNCTLOOKUP = "C:\\Users\\betha\\Code\\nea\\nea\\LookupGammaFunct.txt";
+        private const string EXPECTEDLENGTHS = "C:\\Users\\betha\\Code\\nea\\nea\\ExpectedWordLengths.txt";
+        private const int MAXENGWORDLENGTH = 20;
+        private const int OPTIMALN = 100;
+        private const int NUMINTERVALS = 1000;
+        private Dictionary<double, double> LookupGammaFunct = new Dictionary<double, double>();
+        private double[] expectedEngDistribution = new double[MAXENGWORDLENGTH + 1];
+
+        public WordLength()
+        {
+            using (StreamReader sr = new StreamReader(GAMMAFUNCTLOOKUP))
+            {
+                while (!sr.EndOfStream)
+                {
+                    string[] kvp = sr.ReadLine().Trim().Split('|');
+                    LookupGammaFunct.Add(double.Parse(kvp[0]), double.Parse(kvp[1]));
+                }
+                sr.Close();
+            }
+
+            using (StreamReader sr = new StreamReader(EXPECTEDLENGTHS))
+            {
+                for (int i = 0; i < MAXENGWORDLENGTH + 1; i++)
+                {
+                    expectedEngDistribution[i] = double.Parse(sr.ReadLine().Trim().Split('|')[1]);
+                }
+                sr.Close();
+            }
+        }
+
+        public double Classify(string text)
+        {
+            int numWords = 0;
+
+            double[] expectedFreqs = new double[MAXENGWORDLENGTH + 1];
+            for (int i = 0; i < MAXENGWORDLENGTH + 1; i++) expectedFreqs[i] = expectedEngDistribution[i] * OPTIMALN;
+
+            double[] observedFreqs = new double[MAXENGWORDLENGTH + 1];
+            int currentWordLength = 0;
+            for (int i = 0; i < text.Length; i++)
+            {
+                if (char.IsLetter(text[i]))
+                {
+                    currentWordLength++;
+                }
+                else
+                {
+                    if (currentWordLength != 0)
+                    {
+
+                        if (currentWordLength <= MAXENGWORDLENGTH) observedFreqs[currentWordLength - 1]++;
+                        else observedFreqs[MAXENGWORDLENGTH]++;
+                        currentWordLength = 0;
+                        numWords++;
+                    }
+                }
+            }
+            if (currentWordLength != 0) observedFreqs[currentWordLength - 1]++;
+            for (int i = 0; i < MAXENGWORDLENGTH + 1; i++)
+            {
+                observedFreqs[i] *= ((double)OPTIMALN / numWords);
+            }
+
+            (double[] combinedObsFreqs, double[] combinedExpFreqs) = Statistics.CombineChiSquaredClasses(observedFreqs, expectedFreqs, OPTIMALN);
+
+            int degFreedom = combinedObsFreqs.Length - 1;
+            if (degFreedom == 0) throw new Exception("Text too short: insufficient information to classify.");
+
+            double pValue = Statistics.GetPValue(combinedObsFreqs, combinedExpFreqs, degFreedom, NUMINTERVALS, LookupGammaFunct);
+
+            return pValue;
+        }
+
+    }
+
+    public class Bigrams : IClassifier
+    {
+        private const string GAMMAFUNCTLOOKUP = "C:\\Users\\betha\\Code\\nea\\nea\\LookupGammaFunct.txt";
+        private const string COMMONBIGRAMS = "C:\\Users\\betha\\Code\\nea\\nea\\CommonBigrams.txt";
+        private const int NUMBIGRAMSINFILE = 50;
+        private const int OPTIMALN = 100;
+        private const int NUMINTERVALS = 1000;
+        private Dictionary<double, double> LookupGammaFunct = new Dictionary<double, double>();
+        private Dictionary<string, (double, int)> bigramsExpAndObs = new Dictionary<string, (double, int)>();
+
+
+        public Bigrams()
+        {
+            using (StreamReader sr = new StreamReader(GAMMAFUNCTLOOKUP))
+            {
+                while (!sr.EndOfStream)
+                {
+                    string[] kvp = sr.ReadLine().Trim().Split('|');
+                    LookupGammaFunct.Add(double.Parse(kvp[0]), double.Parse(kvp[1]));
+                }
+                sr.Close();
+            }
+
+            using (StreamReader sr = new StreamReader(COMMONBIGRAMS))
+            {
+                for (int i = 0; i < NUMBIGRAMSINFILE + 1; i++)
+                {
+                    string[] bigramFreq = sr.ReadLine().Trim().Split('|');
+                    bigramsExpAndObs.Add(bigramFreq[0], (double.Parse(bigramFreq[1]), 0));
+                }
+                sr.Close();
+            }
+        }
+
+        public double Classify(string text)
+        {
+            int numBigrams = 0;
+
+            for (int i = 0; i < text.Length - 1; i++)
+            {
+                if (!(char.IsLetter(text[i]) && char.IsLetter(text[i + 1]))) continue;
+
+                string bigram = text[i].ToString() + text[i + 1].ToString();
+                numBigrams++;
+
+                if (bigramsExpAndObs.ContainsKey(bigram.ToUpper()))
+                {
+                    bigramsExpAndObs[bigram.ToUpper()] = (bigramsExpAndObs[bigram.ToUpper()].Item1, bigramsExpAndObs[bigram.ToUpper()].Item2 + 1);
+                }
+                else bigramsExpAndObs["OTHER"] = (bigramsExpAndObs["OTHER"].Item1, bigramsExpAndObs["OTHER"].Item2 + 1);
+            }
+
+            double[] expectedFreqs = new double[NUMBIGRAMSINFILE + 1];
+            double[] observedFreqs = new double[NUMBIGRAMSINFILE + 1];
+
+            int j = 0;
+            foreach (KeyValuePair<string, (double, int)> kvp in  bigramsExpAndObs)
+            {
+                expectedFreqs[j] = kvp.Value.Item1 * OPTIMALN;
+                observedFreqs[j] = kvp.Value.Item2 * ((double) OPTIMALN / numBigrams);
+                j++;
+            }
+
+            (double[] combinedObsFreqs, double[] combinedExpFreqs) = Statistics.CombineChiSquaredClasses(observedFreqs, expectedFreqs, OPTIMALN);
+
+            int degFreedom = combinedObsFreqs.Length - 1;
+            if (degFreedom == 0) throw new Exception("Text too short: insufficient information to classify.");
+
+            double pValue = Statistics.GetPValue(combinedObsFreqs, combinedExpFreqs, degFreedom, NUMINTERVALS, LookupGammaFunct);
+
+            return pValue;
+        }
+
 
     }
 

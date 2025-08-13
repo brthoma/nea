@@ -30,11 +30,11 @@ namespace nea
 
             iterations = UI.GetIntInput("Enter number of iterations: ");
 
-            dataGenerator = UI.GetChoice(new string[] {"WordsFromDict"}, "Choose data generator: ");
+            dataGenerator = UI.GetChoice(new string[] {"WordsFromDict", "TextFromCorpus" }, "Choose data generator: ");
 
             cipher = UI.GetChoice(new string[] { "XOR", "ROT47", "ROT13", "Vigenere", "Substitution" }, "Choose cipher: ");
 
-            classifier = UI.GetChoice(new string[] { "RandomGuesser", "ProportionPrintable", "DictionaryLookup", "FrequencyAnalysis", "Entropy", "MajorityVoteEnsemble" }, "Choose classifier: ");
+            classifier = UI.GetChoice(new string[] { "RandomGuesser", "ProportionPrintable", "DictionaryLookup", "FrequencyAnalysis", "Bigrams", "WordLength", "Entropy", "MajorityVoteEnsemble" }, "Choose classifier: ");
         }
 
         public TestConfiguration(string filePath, int textLength, int iterations, string dataGenerator, string cipher, string classifier)
@@ -103,11 +103,11 @@ namespace nea
 
             threshold = UI.GetDoubleInput("Enter classifier threshold to use: ");
 
-            dataGenerator = UI.GetChoice(new string[] { "WordsFromDict" }, "Choose data generator: ");
+            dataGenerator = UI.GetChoice(new string[] { "WordsFromDict", "TextFromCorpus" }, "Choose data generator: ");
 
             cipher = UI.GetChoice(new string[] { "XOR", "ROT47", "ROT13", "Vigenere", "Substitution" }, "Choose cipher: ");
 
-            classifier = UI.GetChoice(new string[] { "RandomGuesser", "ProportionPrintable", "DictionaryLookup", "FrequencyAnalysis", "Entropy", "MajorityVoteEnsemble" }, "Choose classifier: ");
+            classifier = UI.GetChoice(new string[] { "RandomGuesser", "ProportionPrintable", "DictionaryLookup", "FrequencyAnalysis", "Bigrams", "WordLength", "Entropy", "MajorityVoteEnsemble" }, "Choose classifier: ");
 
             string cryptanalysisMessage = "Choose cryptanalysis method: ";
             switch (cipher)
@@ -156,7 +156,6 @@ namespace nea
                     return classifier;
                 case "cryptanalysis":
                     return cryptanalysis;
-                    break;
                 default:
                     throw new Exception($"No such string property as '{property}'");
             }
