@@ -261,7 +261,8 @@ namespace nea
             foreach (KeyValuePair<string, (double, int)> kvp in  bigramsExpAndObs)
             {
                 expectedFreqs[j] = kvp.Value.Item1 * OPTIMALN;
-                observedFreqs[j] = kvp.Value.Item2 * ((double) OPTIMALN / numBigrams);
+                if (numBigrams == 0) observedFreqs[j] = 0;
+                else observedFreqs[j] = kvp.Value.Item2 * ((double) OPTIMALN / numBigrams);
                 j++;
             }
 

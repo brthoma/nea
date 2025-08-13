@@ -19,3 +19,5 @@
 13/08/2025 14:27:02 | tryentropywithcorpus.txt
 13/08/2025 15:52:35 | TestBigrams.txt
 13/08/2025 16:00:25 | TryBigramsAgainAgain.txt
+13/08/2025 16:04:09 | bigramWithDict.txt
+13/08/2025 16:07:21 | TryBigrams.txt
