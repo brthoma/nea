@@ -3,16 +3,20 @@
   "WorkspaceRootPath": "C:\\Users\\betha\\Code\\nea\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|c:\\users\\betha\\code\\nea\\nea\\commonbigrams.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|solutionrelative:nea\\commonbigrams.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
+      "AbsoluteMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|C:\\Users\\betha\\Code\\nea\\nea\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|solutionrelative:nea\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|C:\\Users\\betha\\Code\\nea\\nea\\iclassifier.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|solutionrelative:nea\\iclassifier.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|C:\\Users\\betha\\Code\\nea\\nea\\icryptanalysis.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|solutionrelative:nea\\icryptanalysis.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|C:\\Users\\betha\\Code\\nea\\nea\\irunner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|solutionrelative:nea\\irunner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6B6A282D-41D2-495E-BE7B-482F466760CE}|neaTest\\neaTest.csproj|c:\\users\\betha\\code\\nea\\neatest\\rot13encryptiontest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6B6A282D-41D2-495E-BE7B-482F466760CE}|neaTest\\neaTest.csproj|solutionrelative:neatest\\rot13encryptiontest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|C:\\Users\\betha\\Code\\nea\\nea\\icipher.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -23,56 +27,36 @@
       "RelativeMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|solutionrelative:nea\\idatagenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|c:\\users\\betha\\code\\nea\\nea\\statistics.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|solutionrelative:nea\\statistics.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|C:\\Users\\betha\\Code\\nea\\nea\\stump.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|solutionrelative:nea\\stump.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|C:\\Users\\betha\\Code\\nea\\nea\\itrainensemble.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|solutionrelative:nea\\itrainensemble.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|c:\\users\\betha\\code\\nea\\nea\\iclassifier.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|solutionrelative:nea\\iclassifier.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|C:\\Users\\betha\\Code\\nea\\nea\\iconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|solutionrelative:nea\\iconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|c:\\users\\betha\\code\\nea\\nea\\icryptanalysis.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|solutionrelative:nea\\icryptanalysis.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|c:\\users\\betha\\code\\nea\\nea\\englishletterdistribution.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|solutionrelative:nea\\englishletterdistribution.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|c:\\users\\betha\\code\\nea\\nea\\itrainensemble.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|solutionrelative:nea\\itrainensemble.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|c:\\users\\betha\\code\\nea\\nea\\datacorpus.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|solutionrelative:nea\\datacorpus.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|c:\\users\\betha\\code\\nea\\nea\\expectedwordlengths.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|solutionrelative:nea\\expectedwordlengths.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|C:\\Users\\betha\\Code\\nea\\nea\\idisplaygraph.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|solutionrelative:nea\\idisplaygraph.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|C:\\Users\\betha\\Code\\nea\\nea\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|solutionrelative:nea\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|C:\\Users\\betha\\Code\\nea\\nea\\ui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|solutionrelative:nea\\ui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|C:\\Users\\betha\\Code\\nea\\nea\\iresultsstore.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|solutionrelative:nea\\iresultsstore.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|c:\\users\\betha\\code\\nea\\nea\\testfiles.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|solutionrelative:nea\\testfiles.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
+      "AbsoluteMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|C:\\Users\\betha\\Code\\nea\\nea\\idisplaygraph.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|solutionrelative:nea\\idisplaygraph.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|c:\\users\\betha\\code\\nea\\nea\\ui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|solutionrelative:nea\\ui.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|c:\\users\\betha\\code\\nea\\nea\\demofiles.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|solutionrelative:nea\\demofiles.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
+      "AbsoluteMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|C:\\Users\\betha\\Code\\nea\\nea\\statistics.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AB69090C-5850-45DA-AC71-C70E695A819F}|nea\\nea.csproj|solutionrelative:nea\\statistics.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\betha\\Code\\nea\\.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}",
@@ -89,128 +73,74 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 11,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "CommonBigrams.txt",
-              "DocumentMoniker": "C:\\Users\\betha\\Code\\nea\\nea\\CommonBigrams.txt",
-              "RelativeDocumentMoniker": "nea\\CommonBigrams.txt",
-              "ToolTip": "C:\\Users\\betha\\Code\\nea\\nea\\CommonBigrams.txt*",
-              "RelativeToolTip": "nea\\CommonBigrams.txt*",
-              "ViewState": "AQIAABgAAAAAAAAAAAAAACUAAAAJAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
-              "WhenOpened": "2025-08-13T13:30:06.998Z",
+              "DocumentIndex": 3,
+              "Title": "ROT13EncryptionTest.cs",
+              "DocumentMoniker": "C:\\Users\\betha\\Code\\nea\\neaTest\\ROT13EncryptionTest.cs",
+              "RelativeDocumentMoniker": "neaTest\\ROT13EncryptionTest.cs",
+              "ToolTip": "C:\\Users\\betha\\Code\\nea\\neaTest\\ROT13EncryptionTest.cs",
+              "RelativeToolTip": "neaTest\\ROT13EncryptionTest.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-08T14:32:21.295Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 6,
+              "Title": "Stump.cs",
+              "DocumentMoniker": "C:\\Users\\betha\\Code\\nea\\nea\\Stump.cs",
+              "RelativeDocumentMoniker": "nea\\Stump.cs",
+              "ToolTip": "C:\\Users\\betha\\Code\\nea\\nea\\Stump.cs",
+              "RelativeToolTip": "nea\\Stump.cs",
+              "ViewState": "AQIAABEAAAAAAAAAAAAQwGAAAAAxAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-06T21:24:06.798Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
               "Title": "ITrainEnsemble.cs",
               "DocumentMoniker": "C:\\Users\\betha\\Code\\nea\\nea\\ITrainEnsemble.cs",
               "RelativeDocumentMoniker": "nea\\ITrainEnsemble.cs",
               "ToolTip": "C:\\Users\\betha\\Code\\nea\\nea\\ITrainEnsemble.cs",
               "RelativeToolTip": "nea\\ITrainEnsemble.cs",
-              "ViewState": "AQIAAEYAAAAAAAAAAAAgwKQAAABKAAAA",
+              "ViewState": "AQIAAIMAAAAAAAAAAAAUwLIAAAAjAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-08-13T13:11:58.595Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "EnglishLetterDistribution.txt",
-              "DocumentMoniker": "C:\\Users\\betha\\Code\\nea\\nea\\EnglishLetterDistribution.txt",
-              "RelativeDocumentMoniker": "nea\\EnglishLetterDistribution.txt",
-              "ToolTip": "C:\\Users\\betha\\Code\\nea\\nea\\EnglishLetterDistribution.txt",
-              "RelativeToolTip": "nea\\EnglishLetterDistribution.txt",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
-              "WhenOpened": "2025-08-13T12:24:39.197Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "ExpectedWordLengths.txt",
-              "DocumentMoniker": "C:\\Users\\betha\\Code\\nea\\nea\\ExpectedWordLengths.txt",
-              "RelativeDocumentMoniker": "nea\\ExpectedWordLengths.txt",
-              "ToolTip": "C:\\Users\\betha\\Code\\nea\\nea\\ExpectedWordLengths.txt",
-              "RelativeToolTip": "nea\\ExpectedWordLengths.txt",
-              "ViewState": "AQIAAAkAAAAAAAAAAAAuwBQAAAAFAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
-              "WhenOpened": "2025-08-13T12:24:25.042Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 13,
               "Title": "Statistics.cs",
               "DocumentMoniker": "C:\\Users\\betha\\Code\\nea\\nea\\Statistics.cs",
               "RelativeDocumentMoniker": "nea\\Statistics.cs",
               "ToolTip": "C:\\Users\\betha\\Code\\nea\\nea\\Statistics.cs",
               "RelativeToolTip": "nea\\Statistics.cs",
-              "ViewState": "AQIAABAAAAAAAAAAAAAgwBEAAAANAAAA",
+              "ViewState": "AQIAADoAAAAAAAAAAAAcwEUAAAAJAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-13T11:21:16.116Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-13T11:21:16.116Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 10,
-              "Title": "DataCorpus.txt",
-              "DocumentMoniker": "C:\\Users\\betha\\Code\\nea\\nea\\DataCorpus.txt",
-              "RelativeDocumentMoniker": "nea\\DataCorpus.txt",
-              "ToolTip": "C:\\Users\\betha\\Code\\nea\\nea\\DataCorpus.txt",
-              "RelativeToolTip": "nea\\DataCorpus.txt",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAOXcAAAhAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
-              "WhenOpened": "2025-08-11T17:41:09.285Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 17,
-              "Title": "DemoFiles.txt",
-              "DocumentMoniker": "C:\\Users\\betha\\Code\\nea\\nea\\DemoFiles.txt",
-              "RelativeDocumentMoniker": "nea\\DemoFiles.txt",
-              "ToolTip": "C:\\Users\\betha\\Code\\nea\\nea\\DemoFiles.txt",
-              "RelativeToolTip": "nea\\DemoFiles.txt",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAgAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
-              "WhenOpened": "2025-08-10T15:25:41.158Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 15,
-              "Title": "TestFiles.txt",
-              "DocumentMoniker": "C:\\Users\\betha\\Code\\nea\\nea\\TestFiles.txt",
-              "RelativeDocumentMoniker": "nea\\TestFiles.txt",
-              "ToolTip": "C:\\Users\\betha\\Code\\nea\\nea\\TestFiles.txt",
-              "RelativeToolTip": "nea\\TestFiles.txt",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAABcAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
-              "WhenOpened": "2025-08-10T15:24:09.69Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 16,
               "Title": "UI.cs",
               "DocumentMoniker": "C:\\Users\\betha\\Code\\nea\\nea\\UI.cs",
               "RelativeDocumentMoniker": "nea\\UI.cs",
               "ToolTip": "C:\\Users\\betha\\Code\\nea\\nea\\UI.cs",
               "RelativeToolTip": "nea\\UI.cs",
-              "ViewState": "AQIAAC4AAAAAAAAAAAAgwB0AAAAQAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAE0AAAAVAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-10T14:27:12.41Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-10T14:27:12.41Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 14,
               "Title": ".gitignore",
               "DocumentMoniker": "C:\\Users\\betha\\Code\\nea\\.gitignore",
               "RelativeDocumentMoniker": ".gitignore",
@@ -222,26 +152,26 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 1,
               "Title": "ICryptanalysis.cs",
               "DocumentMoniker": "C:\\Users\\betha\\Code\\nea\\nea\\ICryptanalysis.cs",
               "RelativeDocumentMoniker": "nea\\ICryptanalysis.cs",
               "ToolTip": "C:\\Users\\betha\\Code\\nea\\nea\\ICryptanalysis.cs",
               "RelativeToolTip": "nea\\ICryptanalysis.cs",
-              "ViewState": "AQIAABcAAAAAAAAAAAAwwP0AAAAIAAAA",
+              "ViewState": "AQIAADsAAAAAAAAAAAAtwEIAAAAtAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-23T15:09:45.791Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 8,
               "Title": "IClassifier.cs",
               "DocumentMoniker": "C:\\Users\\betha\\Code\\nea\\nea\\IClassifier.cs",
               "RelativeDocumentMoniker": "nea\\IClassifier.cs",
-              "ToolTip": "C:\\Users\\betha\\Code\\nea\\nea\\IClassifier.cs*",
-              "RelativeToolTip": "nea\\IClassifier.cs*",
-              "ViewState": "AQIAAAMAAAAAAAAAAAAAABYAAAApAAAA",
+              "ToolTip": "C:\\Users\\betha\\Code\\nea\\nea\\IClassifier.cs",
+              "RelativeToolTip": "nea\\IClassifier.cs",
+              "ViewState": "AQIAAD4AAAAAAAAAAAAuwBEAAABOAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-18T09:51:53.291Z",
               "EditorCaption": ""
@@ -254,72 +184,70 @@
               "RelativeDocumentMoniker": "nea\\IRunner.cs",
               "ToolTip": "C:\\Users\\betha\\Code\\nea\\nea\\IRunner.cs",
               "RelativeToolTip": "nea\\IRunner.cs",
-              "ViewState": "AQIAAA4BAAAAAAAAAAAwwEUAAAAAAAAA",
+              "ViewState": "AQIAAFEAAAAAAAAAAAAkwFoAAAA2AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-18T11:14:43.017Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 9,
               "Title": "IConfiguration.cs",
               "DocumentMoniker": "C:\\Users\\betha\\Code\\nea\\nea\\IConfiguration.cs",
               "RelativeDocumentMoniker": "nea\\IConfiguration.cs",
               "ToolTip": "C:\\Users\\betha\\Code\\nea\\nea\\IConfiguration.cs",
               "RelativeToolTip": "nea\\IConfiguration.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAgAAAABAAAA",
+              "ViewState": "AQIAAAoAAAAAAAAAAAAQwLoAAAAuAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-18T09:55:20.135Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-18T09:55:20.135Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 11,
               "Title": "IResultsStore.cs",
               "DocumentMoniker": "C:\\Users\\betha\\Code\\nea\\nea\\IResultsStore.cs",
               "RelativeDocumentMoniker": "nea\\IResultsStore.cs",
               "ToolTip": "C:\\Users\\betha\\Code\\nea\\nea\\IResultsStore.cs",
               "RelativeToolTip": "nea\\IResultsStore.cs",
-              "ViewState": "AQIAAF4AAAAAAAAAAAAcwFIAAABaAAAA",
+              "ViewState": "AQIAAG8AAAAAAAAAAAAmwBQAAAATAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-18T10:00:04.184Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-18T10:00:04.184Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 0,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\betha\\Code\\nea\\nea\\Program.cs",
               "RelativeDocumentMoniker": "nea\\Program.cs",
               "ToolTip": "C:\\Users\\betha\\Code\\nea\\nea\\Program.cs",
               "RelativeToolTip": "nea\\Program.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAA4AAAAlAAAA",
+              "ViewState": "AQIAABUAAAAAAAAAAAAWwBwAAAAsAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-04T06:20:44.646Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "ICipher.cs",
               "DocumentMoniker": "C:\\Users\\betha\\Code\\nea\\nea\\ICipher.cs",
               "RelativeDocumentMoniker": "nea\\ICipher.cs",
               "ToolTip": "C:\\Users\\betha\\Code\\nea\\nea\\ICipher.cs",
               "RelativeToolTip": "nea\\ICipher.cs",
-              "ViewState": "AQIAAJcAAAAAAAAAAAAQwIwAAAAIAAAA",
+              "ViewState": "AQIAABQAAAAAAAAAAAAwwBAAAAAPAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-18T09:40:46.468Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "IDataGenerator.cs",
               "DocumentMoniker": "C:\\Users\\betha\\Code\\nea\\nea\\IDataGenerator.cs",
               "RelativeDocumentMoniker": "nea\\IDataGenerator.cs",
               "ToolTip": "C:\\Users\\betha\\Code\\nea\\nea\\IDataGenerator.cs",
               "RelativeToolTip": "nea\\IDataGenerator.cs",
-              "ViewState": "AQIAABAAAAAAAAAAAAA3wDMAAAAMAAAA",
+              "ViewState": "AQIAACYAAAAAAAAAAAAIwDYAAAAJAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-18T09:53:55.791Z",
               "EditorCaption": ""
@@ -332,14 +260,13 @@
               "RelativeDocumentMoniker": "nea\\IDisplayGraph.cs",
               "ToolTip": "C:\\Users\\betha\\Code\\nea\\nea\\IDisplayGraph.cs",
               "RelativeToolTip": "nea\\IDisplayGraph.cs",
-              "ViewState": "AQIAAMkAAAAAAAAAAAAkwPMAAAAcAAAA",
+              "ViewState": "AQIAAOMAAAAAAAAAAAAswPIAAAANAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-20T14:35:36.192Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-20T14:35:36.192Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 15,
               "Title": "nea",
               "DocumentMoniker": "C:\\Users\\betha\\Code\\nea\\nea\\nea.csproj",
               "RelativeDocumentMoniker": "nea\\nea.csproj",

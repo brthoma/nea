@@ -11,6 +11,7 @@ namespace nea
 
         public static string GetChoice(string[] options, string message)
         {
+            Console.CursorVisible = false;
             Console.Clear();
             Console.WriteLine(message);
             Console.WriteLine();
@@ -27,34 +28,35 @@ namespace nea
                 Console.SetCursorPosition(2, line);
                 Console.Write(">");
 
-                ConsoleKey keyPressed = Console.ReadKey().Key;
+                ConsoleKey keyPressed = Console.ReadKey(true).Key;
+
+                // Clear the cursor
+                Console.SetCursorPosition(2, line);
+                Console.Write(" ");
 
                 switch (keyPressed)
                 {
                     case ConsoleKey.DownArrow:
                         if (line < 1 + options.Length)
                         {
-                            Console.SetCursorPosition(2, line);
-                            Console.Write(" ");
                             line++;
                         }
                         break;
                     case ConsoleKey.UpArrow:
                         if (line > 2)
                         {
-                            Console.SetCursorPosition(2, line);
-                            Console.Write(" ");
                             line--;
                         }
                         break;
                     case ConsoleKey.Enter:
                         Console.Clear();
+                        Console.CursorVisible = true;
                         return options[line - 2];
                 }
             }
         }
 
-        public static List<string> GetChoices(string[] options, string message)
+        public static string[] GetChoices(string[] options, string message)
         {
             List<string> choices = new List<string>();
 
@@ -70,7 +72,10 @@ namespace nea
                 string choice = GetChoice(newOptions, message);
                 if (choice == "Done")
                 {
-                    if (choices.Count() > 0) return choices;
+                    if (choices.Count() > 0)
+                    {
+                        return choices.ToArray();
+                    }
                 }
 
                 else choices.Add(choice);
@@ -84,8 +89,7 @@ namespace nea
                 Console.Write(message);
                 try
                 {
-                    int input = int.Parse(Console.ReadLine());
-                    return input;
+                    return int.Parse(Console.ReadLine());
                 }
                 catch
                 {
@@ -101,8 +105,7 @@ namespace nea
                 Console.Write(message);
                 try
                 {
-                    double input = double.Parse(Console.ReadLine());
-                    return input;
+                    return double.Parse(Console.ReadLine());
                 }
                 catch
                 {
@@ -114,8 +117,7 @@ namespace nea
         public static string GetStringInput(string message)
         {
             Console.Write(message);
-            string input = Console.ReadLine();
-            return input;
+            return Console.ReadLine();
         }
 
     }

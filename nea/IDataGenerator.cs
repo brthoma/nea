@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Dynamic;
 
 namespace nea
 {
@@ -17,15 +18,16 @@ namespace nea
     public class WordsFromDict : IDataGenerator
     {
         private string dictionaryFilePath;
+        private string[] dictionary;
 
         public WordsFromDict(string dictionaryFilePath)
         {
             this.dictionaryFilePath = dictionaryFilePath;
+            this.dictionary = File.ReadAllLines(dictionaryFilePath);
         }
 
         public string GenerateData(Random random, int length)
         {
-            string[] dictionary = File.ReadAllLines(dictionaryFilePath);
             string text = "";
 
             do
@@ -41,15 +43,16 @@ namespace nea
     public class TextFromCorpus : IDataGenerator
     {
         private string corpusFilePath;
+        private string corpus;
 
         public TextFromCorpus(string corpusFilePath)
         {
             this.corpusFilePath = corpusFilePath;
+            this.corpus = File.ReadAllText(corpusFilePath);
         }
 
         public string GenerateData(Random random, int length)
         {
-            string corpus = File.ReadAllText(corpusFilePath);
             int randomStart = random.Next(corpus.Length - length);
             string text = corpus.Substring(randomStart, length);
 
@@ -58,5 +61,24 @@ namespace nea
 
     }
 
+
+    class DataGeneratorFactory
+    {
+        private const string DICTIONARYFILEPATH = "FilesForUse\\EnglishDictionary.txt";
+        private const string CORPUSFILEPATH = "FilesForUse\\DataCorpus.txt";
+
+        public static IDataGenerator GetDataGenerator(string dataGeneratorType)
+        {
+            switch (dataGeneratorType)
+            {
+                case "WordsFromDict":
+                    return new WordsFromDict(DICTIONARYFILEPATH);
+                case "TextFromCorpus":
+                    return new TextFromCorpus(CORPUSFILEPATH);
+                default:
+                    throw new Exception("No valid data generator selected");
+            }
+        }
+    }
 
 }

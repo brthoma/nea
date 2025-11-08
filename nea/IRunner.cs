@@ -18,89 +18,21 @@ namespace nea
     public class ClassifierTestRunner : IRunner
     {
 
-        private const string DICTIONARYFILEPATH = "C:\\Users\\betha\\Code\\nea\\nea\\EnglishDictionary.txt";
-        private const string CORPUSFILEPATH = "C:\\Users\\betha\\Code\\nea\\nea\\DataCorpus.txt";
-
         public void Run(IConfiguration config)
         {
             Random random = new Random();
 
             TestResultsStore resultsStore = new TestResultsStore();
 
-            IDataGenerator dataGenerator;
-            ICipher cipher;
-            IClassifier classifier;
+            IDataGenerator dataGenerator = DataGeneratorFactory.GetDataGenerator(config.GetStr("dataGenerator"));
+            ICipher cipher = CipherFactory.GetCipher(config.GetStr("cipher"));
 
             double[] results = new double[config.GetInt("iterations")];
             bool[] trueValues = new bool[config.GetInt("iterations")];
 
-            switch (config.GetStr("dataGenerator"))
-            {
-                case "WordsFromDict":
-                    dataGenerator = new WordsFromDict(DICTIONARYFILEPATH);
-                    break;
-                case "TextFromCorpus":
-                    dataGenerator = new TextFromCorpus(CORPUSFILEPATH);
-                    break;
-                default:
-                    throw new Exception("No valid data generator selected");
-            }
-            
-            switch (config.GetStr("cipher"))
-            {
-                case "XOR":
-                    cipher = new XOR();
-                    break;
-                case "ROT47":
-                    cipher = new ROT47();
-                    break;
-                case "ROT13":
-                    cipher = new ROT13();
-                    break;
-                case "Vigenere":
-                    cipher = new Vigenere();
-                    break;
-                case "Substitution":
-                    cipher = new Substitution();
-                    break;
-                default:
-                    throw new Exception("No valid cipher selected");
-            }
-
-
             for (int i = 0; i < config.GetInt("iterations"); i++)
             {
-                switch (config.GetStr("classifier"))
-                {
-                    case "RandomGuesser":
-                        classifier = new RandomGuesser();
-                        break;
-                    case "ProportionPrintable":
-                        classifier = new ProportionPrintable();
-                        break;
-                    case "DictionaryLookup":
-                        classifier = new DictionaryLookup();
-                        break;
-                    case "FrequencyAnalysis":
-                        classifier = new FrequencyAnalysis();
-                        break;
-                    case "Bigrams":
-                        classifier = new Bigrams();
-                        break;
-                    case "WordLength":
-                        classifier = new WordLength();
-                        break;
-                    case "Entropy":
-                        classifier = new Entropy();
-                        break;
-                    case "MajorityVoteEnsemble":
-                        IClassifier[] classifiers = new IClassifier[] { new RandomGuesser(), new ProportionPrintable(), new DictionaryLookup(), new FrequencyAnalysis(), new Entropy() };
-                        MajVoting trainer = new MajVoting();
-                        classifier = new Ensemble(classifiers, trainer.GetWeights(classifiers, cipher));
-                        break;
-                    default:
-                        throw new Exception("No valid classifier selected");
-                }
+                IClassifier classifier = ClassifierFactory.GetClassifier(config.GetStr("classifier"), cipher);
 
                 string text = dataGenerator.GenerateData(random, config.GetInt("textLength"));
                 if (random.Next(2) == 0)
@@ -124,8 +56,6 @@ namespace nea
 
     public class DemoRunner : IRunner
     {
-        private const string DICTIONARYFILEPATH = "C:\\Users\\betha\\Code\\nea\\nea\\EnglishDictionary.txt";
-        private const string CORPUSFILEPATH = "C:\\Users\\betha\\Code\\nea\\nea\\DataCorpus.txt";
 
         public void Run(IConfiguration config)
         {
@@ -133,107 +63,20 @@ namespace nea
 
             DemoResultsStore resultsStore = new DemoResultsStore();
 
-            IDataGenerator dataGenerator;
-            ICipher cipher;
-            IClassifier classifier;
-            ICryptanalysis cryptanalysis;
+            IDataGenerator dataGenerator = DataGeneratorFactory.GetDataGenerator(config.GetStr("dataGenerator"));
+            ICipher cipher = CipherFactory.GetCipher(config.GetStr("cipher"));
 
             double[] results = new double[config.GetInt("iterations")];
             bool[] trueValues = new bool[config.GetInt("iterations")];
 
-            switch (config.GetStr("dataGenerator"))
-            {
-                case "WordsFromDict":
-                    dataGenerator = new WordsFromDict(DICTIONARYFILEPATH);
-                    break;
-                case "TextFromCorpus":
-                    dataGenerator = new TextFromCorpus(CORPUSFILEPATH);
-                    break;
-                default:
-                    throw new Exception("No valid data generator selected");
-            }
-
-            switch (config.GetStr("cipher"))
-            {
-                case "XOR":
-                    cipher = new XOR();
-                    break;
-                case "ROT47":
-                    cipher = new ROT47();
-                    break;
-                case "ROT13":
-                    cipher = new ROT13();
-                    break;
-                case "Vigenere":
-                    cipher = new Vigenere();
-                    break;
-                case "Substitution":
-                    cipher = new Substitution();
-                    break;
-                default:
-                    throw new Exception("No valid cipher selected");
-            }
-
-            
 
             bool[] success = new bool[config.GetInt("iterations")];
 
             for (int i = 0; i < config.GetInt("iterations"); i++)
             {
-                switch (config.GetStr("classifier"))
-                {
-                    case "RandomGuesser":
-                        classifier = new RandomGuesser();
-                        break;
-                    case "ProportionPrintable":
-                        classifier = new ProportionPrintable();
-                        break;
-                    case "DictionaryLookup":
-                        classifier = new DictionaryLookup();
-                        break;
-                    case "FrequencyAnalysis":
-                        classifier = new FrequencyAnalysis();
-                        break;
-                    case "Bigrams":
-                        classifier = new Bigrams();
-                        break;
-                    case "WordLength":
-                        classifier = new WordLength();
-                        break;
-                    case "Entropy":
-                        classifier = new Entropy();
-                        break;
-                    case "MajorityVoteEnsemble":
-                        IClassifier[] classifiers = new IClassifier[] { new RandomGuesser(), new ProportionPrintable(), new DictionaryLookup(), new FrequencyAnalysis(), new Entropy() };
-                        MajVoting trainer = new MajVoting();
-                        classifier = new Ensemble(classifiers, trainer.GetWeights(classifiers, cipher));
-                        break;
-                    default:
-                        throw new Exception("No valid classifier selected");
-                }
-                switch (config.GetStr("cryptanalysis"))
-                {
-                    case "XORCryptanalysis":
-                        cryptanalysis = new XORCryptanalysis();
-                        break;
-                    case "ROT47Cryptanalysis":
-                        cryptanalysis = new ROT47Cryptanalysis();
-                        break;
-                    case "ROT13Cryptanalysis":
-                        cryptanalysis = new ROT13Cryptanalysis();
-                        break;
-                    case "FasterROT13Cryptanalysis":
-                        cryptanalysis = new FasterROT13Cryptanalysis();
-                        break;
-                    case "VigenereCryptanalysis":
-                        cryptanalysis = new VigenereCryptanalysis();
-                        break;
-                    case "SubstitutionCryptanalysis":
-                        cryptanalysis = new SubstitutionCryptanalysis();
-                        break;
-                    default:
-                        throw new Exception("No valid cryptanalysis selected");
-                }
+                IClassifier classifier = ClassifierFactory.GetClassifier(config.GetStr("classifier"), cipher);
+                ICryptanalysis cryptanalysis = CryptanalysisFactory.GetCryptanalysis(config.GetStr("cryptanalysis"));
+
                 string plaintext = dataGenerator.GenerateData(random, config.GetInt("textLength"));
                 string ciphertext = cipher.Encrypt(plaintext, cipher.GetRandomKey(random));
                 string likelyPlaintext;
@@ -244,13 +87,27 @@ namespace nea
                     likelyPlaintext = cipher.Decrypt(ciphertext, key);
                     if (classifier.Classify(likelyPlaintext) >= config.GetDouble("threshold"))
                     {
-                        if (likelyPlaintext == plaintext) success[i] = true;
+                        Console.WriteLine(likelyPlaintext);
+                        Console.WriteLine(ciphertext);
+                        if (likelyPlaintext.ToLower() == plaintext.ToLower())
+                        {
+                            success[i] = true;
+                        }
                         break;
                     }
                 }
+                if (success[i] == false)
+                {
+                    Console.WriteLine(plaintext);
+                    Console.ReadKey();
+                }
+                Console.WriteLine($"Success: {success[i]}");
             }
 
             resultsStore.SaveResults(config, success);
+
+            Console.WriteLine("Press any key to continue:");
+            Console.ReadKey();
         }
     }
 

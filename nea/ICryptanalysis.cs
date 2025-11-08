@@ -39,9 +39,11 @@ namespace nea
                 if (textCounts.ContainsKey(c))
                 {
                     textCounts[c]++;
-                    continue;
                 }
-                textCounts.Add(c, 1);
+                else
+                {
+                    textCounts.Add(c, 1);
+                }
             }
 
             for (int i = 0; i < textCounts.Count; i++)
@@ -62,7 +64,7 @@ namespace nea
     public class ROT47Cryptanalysis : ICryptanalysis
     {
 
-        private const string ORDEROFCHECK = " etaoinsrhldcumfpgwybvkxjqzETAOINSRHLDCUMFPGWYBVKXJQZ,.";
+        private const string ORDEROFCHECK = "etaoinsrhldcumfpgwybvkxjqzETAOINSRHLDCUMFPGWYBVKXJQZ,.";
         private const int ROT47RANGE = 126 - 33;
         private Dictionary<char, int> textCounts = new Dictionary<char, int>();
         
@@ -70,12 +72,18 @@ namespace nea
         {
             foreach (char c in text)
             {
+                if (c < '!' || c > '~')
+                {
+                    continue;
+                }
                 if (textCounts.ContainsKey(c))
                 {
                     textCounts[c]++;
-                    continue;
                 }
-                textCounts.Add(c, 1);
+                else
+                {
+                    textCounts.Add(c, 1);
+                }
             }
 
             for (int i = 0; i < textCounts.Count; i++)
@@ -156,7 +164,10 @@ namespace nea
                     totalIoC += CalcIdxOfCoincidence(slice);
                 }
 
-                if (totalIoC / i > IOTTHRESHOLD) yield return (i, slices);
+                if (totalIoC / i > IOTTHRESHOLD)
+                {
+                    yield return (i, slices);
+                }
             }
 
         }
@@ -266,7 +277,7 @@ namespace nea
 
     public class XORCryptanalysis : ICryptanalysis
     {
-        private const double IOTTHRESHOLD = 0.06; //This is ~ 1.5 / 26 but will probably need to justify this in writeup
+        private const double IOTTHRESHOLD = 0.06; //This is ~ 1.5 / 26 but will need to justify this in writeup
 
         private string[] GetSlices(string text, int numSlices)
         {
@@ -323,14 +334,17 @@ namespace nea
                     totalIoC += CalcIdxOfCoincidence(slice);
                 }
 
-                if (totalIoC / i > IOTTHRESHOLD) yield return (i, slices);
+                if (totalIoC / i > IOTTHRESHOLD)
+                {
+                    yield return (i, slices);
+                }
             }
         }
 
         private IEnumerable<int> GetSingleKey(string slice, int attempts = 26)
         {
             XOR cipher = new XOR();
-            FrequencyAnalysis classifier = new FrequencyAnalysis();
+            IClassifier classifier = new FrequencyAnalysis();
 
             List<int> keys = new List<int>();
             List<double> pvalues = new List<double>();
@@ -388,5 +402,28 @@ namespace nea
         }
     }
 
+    class CryptanalysisFactory
+    {
+        public static ICryptanalysis GetCryptanalysis(string cryptanalysisType)
+        {
+            switch (cryptanalysisType)
+            {
+                case "XORCryptanalysis":
+                    return new XORCryptanalysis();
+                case "ROT47Cryptanalysis":
+                    return new ROT47Cryptanalysis();
+                case "ROT13Cryptanalysis":
+                    return new ROT13Cryptanalysis();
+                case "FasterROT13Cryptanalysis":
+                    return new FasterROT13Cryptanalysis();
+                case "VigenereCryptanalysis":
+                    return new VigenereCryptanalysis();
+                case "SubstitutionCryptanalysis":
+                    return new SubstitutionCryptanalysis();
+                default:
+                    throw new Exception("No valid cryptanalysis selected");
+            }
+        }
+    }
 
 }

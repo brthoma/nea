@@ -14,7 +14,7 @@ namespace nea
     public class TestResultsStore
     {
 
-        public const string TESTFILES = "C:\\Users\\betha\\Code\\nea\\nea\\TestFiles.txt";
+        public const string TESTFILES = "FilesForUse\\TestFiles.txt";
 
         public void SaveResults(IConfiguration config, double[] values, bool[] trueValues)
         {
@@ -51,7 +51,6 @@ namespace nea
             {
                 results[i] = double.Parse(strNums[i]);
                 trueValues[i] = bool.Parse(strTrues[i]);
-
             }
 
             return (results, trueValues);
@@ -80,7 +79,7 @@ namespace nea
     
     public class DemoResultsStore
     {
-        public const string DEMOFILES = "C:\\Users\\betha\\Code\\nea\\nea\\DemoFiles.txt";
+        public const string DEMOFILES = "FilesForUse\\DemoFiles.txt";
 
         public void SaveResults(IConfiguration config, bool[] success)
         {

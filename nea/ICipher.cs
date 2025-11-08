@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -22,27 +23,20 @@ namespace nea
     public class XOR : ICipher
     {
 
-        private const int MINRANGE = 65;
-        private const int MAXRANGE = 90;
+        private const int DEFAULTKEYLENGTH = 2;
 
-        public byte[] GetRandomKey(Random random, int length = 2)
+        public byte[] GetRandomKey(Random random, int length)
         {
             string key = "";
             for (int i = 0; i < length; i++)
             {
-                key += (char)(random.Next(MINRANGE, MAXRANGE + 1));
+                key += (char)(random.Next('A', 'Z' + 1));
             }
             return Encoding.UTF8.GetBytes(key);
         }
         public byte[] GetRandomKey(Random random)
         {
-            string key = "";
-            int length = 2;
-            for (int i = 0; i < length; i++)
-            {
-                key += (char)(random.Next(MINRANGE, MAXRANGE + 1));
-            }
-            return Encoding.UTF8.GetBytes(key);
+            return GetRandomKey(random, DEFAULTKEYLENGTH);
         }
 
         public string Encrypt(string plaintext, byte[] bKey)
@@ -86,9 +80,12 @@ namespace nea
             {
                 if (c >= MINRANGE && c <= MAXRANGE)
                 {
-                    ciphertext += (char)(MINRANGE + ( (c - MINRANGE + key) % (MAXRANGE - MINRANGE + 1) ) );
+                    ciphertext += (char)(MINRANGE + ((c - MINRANGE + key) % (RANGE + 1)));
                 }
-                else ciphertext += c;
+                else
+                {
+                    ciphertext += c;
+                }
             }
 
             return ciphertext;
@@ -105,11 +102,7 @@ namespace nea
     public class ROT13 : ICipher
     {
 
-        private const int LOWERMINRANGE = 97;
-        private const int LOWERMAXRANGE = 122;
-        private const int UPPERMINRANGE = 65;
-        private const int UPPERMAXRANGE = 90;
-        private const int RANGE = LOWERMAXRANGE - LOWERMINRANGE;
+        private const int RANGE = 'z' - 'a';
 
         public byte[] GetRandomKey(Random random)
         {
@@ -123,15 +116,18 @@ namespace nea
 
             foreach (char c in plaintext)
             {
-                if (c >= LOWERMINRANGE && c <= LOWERMAXRANGE)
+                if (c >= 'a' && c <= 'z')
                 {
-                    ciphertext += (char)(LOWERMINRANGE + ( (c - LOWERMINRANGE + key) % (LOWERMAXRANGE - LOWERMINRANGE + 1) ) );
+                    ciphertext += (char)('a' + ((c - 'a' + key) % ('z' - 'a' + 1)));
                 }
-                else if (c >= UPPERMINRANGE && c <= UPPERMAXRANGE)
+                else if (c >= 'A' && c <= 'Z')
                 {
-                    ciphertext += (char)(UPPERMINRANGE + ( (c - UPPERMINRANGE + key) % (UPPERMAXRANGE - UPPERMINRANGE + 1) ) );
+                    ciphertext += (char)('A' + ((c - 'A' + key) % ('Z' - 'A' + 1)));
                 }
-                else ciphertext += c;
+                else
+                {
+                    ciphertext += c;
+                }
             }
 
             return ciphertext;
@@ -147,28 +143,22 @@ namespace nea
 
     public class Vigenere : ICipher
     {
-        private const int MINRANGE = 65;
-        private const int MAXRANGE = 90;
-        private const int RANGE = MAXRANGE - MINRANGE;
+        
+        private const int RANGE = 'Z' - 'A';
+        private const int DEFAULTKEYLENGTH = 2;
 
-        public byte[] GetRandomKey(Random random, int length = 2)
+        public byte[] GetRandomKey(Random random, int length)
         {
             string key = "";
             for (int i = 0; i < length; i++)
             {
-                key += (char)(random.Next(MINRANGE, MAXRANGE + 1));
+                key += (char)(random.Next('A', 'Z' + 1));
             }
             return Encoding.UTF8.GetBytes(key);
         }
         public byte[] GetRandomKey(Random random)
         {
-            string key = "";
-            int length = 2;
-            for (int i = 0; i < length; i++)
-            {
-                key += (char)(random.Next(MINRANGE, MAXRANGE + 1));
-            }
-            return Encoding.UTF8.GetBytes(key);
+            return GetRandomKey(random, DEFAULTKEYLENGTH);
         }
 
         public string Encrypt(string plaintext, byte[] bKey)
@@ -181,7 +171,7 @@ namespace nea
 
             for (int i = 0; i < key.Length; i++)
             {
-                keyArr[i] = key[i] - MINRANGE;
+                keyArr[i] = key[i] - 'A';
             }
 
             int keyIdx = 0;
@@ -193,7 +183,10 @@ namespace nea
                     ciphertext += rot13.Encrypt(c.ToString(), BitConverter.GetBytes(keyArr[keyIdx]));
                     keyIdx = (keyIdx + 1) % key.Length;
                 }
-                else ciphertext += c;
+                else
+                {
+                    ciphertext += c;
+                }
             }
 
             return ciphertext;
@@ -206,7 +199,7 @@ namespace nea
             
             for (int i = 0; i < key.Length; i++)
             {
-                encryptKey += (char) (MINRANGE + ((RANGE + 1 - (key[i] - MINRANGE)) % (RANGE + 1)));
+                encryptKey += (char) ('A' + ((RANGE + 1 - (key[i] - 'A')) % (RANGE + 1)));
             }
 
             return Encrypt(ciphertext, Encoding.UTF8.GetBytes(encryptKey));
@@ -215,9 +208,7 @@ namespace nea
 
     public class Substitution : ICipher
     {
-        private const int MINRANGE = 97;
-        private const int MAXRANGE = 122;
-        private const int RANGE = MAXRANGE - MINRANGE;
+        private const int RANGE = 'z' - 'a';
 
         public byte[] GetRandomKey(Random random)
         {
@@ -241,8 +232,14 @@ namespace nea
 
             for (int i = 0; i < key.Length; i++)
             {
-                if (encrypt) transformations.Add((char) (i + 97), (int) key[i] - (i + 97));
-                else transformations.Add(key[i], (int)(i + 97) - key[i]);
+                if (encrypt)
+                {
+                    transformations.Add((char)(i + 97), (int)key[i] - (i + 97));
+                }
+                else
+                {
+                    transformations.Add(key[i], (int)(i + 97) - key[i]);
+                }
             }
 
             return transformations;
@@ -286,5 +283,26 @@ namespace nea
 
     }
 
+    class CipherFactory
+    {
+        public static ICipher GetCipher(string cipherType)
+        {
+            switch (cipherType)
+            {
+                case "XOR":
+                    return new XOR();
+                case "ROT47":
+                    return new ROT47();
+                case "ROT13":
+                    return new ROT13();
+                case "Vigenere":
+                    return new Vigenere();
+                case "Substitution":
+                    return new Substitution();
+                default:
+                    throw new Exception("No valid cipher selected");
+            }
+        }
+    }
 
 }

@@ -18,7 +18,7 @@ namespace nea
     public class ThresholdSuccessGraph : IDisplayGraph
     {
 
-        private const int NUMDATAPOINTS = 100;
+        private const int NUMDATAPOINTS = 1000;
 
         private double GetSuccessAtThreshold(double[] results, bool[] trueValues, double threshold)
         {
@@ -26,7 +26,10 @@ namespace nea
 
             for (int i = 0; i < results.Length; i++)
             {
-                if ((results[i] >= threshold && trueValues[i]) || (results[i] < threshold && !trueValues[i])) success++;
+                if ((results[i] >= threshold && trueValues[i]) || (results[i] < threshold && !trueValues[i]))
+                {
+                    success++;
+                }
             }
 
             return (double) success / results.Length;
@@ -73,7 +76,7 @@ namespace nea
     public class ROCCurve : IDisplayGraph
     {
 
-        private const int NUMDATAPOINTS = 100;
+        private const int NUMDATAPOINTS = 1000;
 
         private (double, double) GetValuesAtThreshold(double[] results, bool[] trueValues, double threshold)
         {
@@ -149,7 +152,7 @@ namespace nea
     public class DETCurve : IDisplayGraph
     {
 
-        private const int NUMDATAPOINTS = 100;
+        private const int NUMDATAPOINTS = 1000;
 
         private (double, double) GetValuesAtThreshold(double[] results, bool[] trueValues, double threshold)
         {

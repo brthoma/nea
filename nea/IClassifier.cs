@@ -9,8 +9,15 @@ using System.Threading.Tasks;
 namespace nea
 {
 
+    /* Interface definition for a Classifier class.
+     * Derived classes classify text samples as being English text or random characters.
+     */
     public interface IClassifier
     {
+        /* Return a value in the range 0-1 indicating whether a piece of text
+         * is English or not. Random characters should cause a result close to
+         * 0.0, while English text should cause a result close to 1.0.
+         */
         double Classify(string text);
     }
 
@@ -34,7 +41,10 @@ namespace nea
             double printable = 0;
             foreach (char c in text)
             {
-                if ( !char.IsControl(c) && !char.IsSurrogate(c) ) printable++;
+                if (!char.IsControl(c) && !char.IsSurrogate(c))
+                {
+                    printable++;
+                }
             }
 
             double proportion = printable / text.Length;
@@ -45,7 +55,7 @@ namespace nea
 
     public class DictionaryLookup : IClassifier
     {
-        private const string DICTIONARYFILEPATH = "C:\\Users\\betha\\Code\\nea\\nea\\EnglishDictionary.txt";
+        private const string DICTIONARYFILEPATH = "FilesForUse\\EnglishDictionary.txt";
 
         public double Classify(string text)
         {
@@ -70,8 +80,8 @@ namespace nea
 
     public class FrequencyAnalysis : IClassifier
     {
-        private const string GAMMAFUNCTLOOKUP = "C:\\Users\\betha\\Code\\nea\\nea\\LookupGammaFunct.txt";
-        private const string EXPECTEDFREQUENCIES = "C:\\Users\\betha\\Code\\nea\\nea\\EnglishLetterDistribution.txt";
+        private const string GAMMAFUNCTLOOKUP = "FilesForUse\\LookupGammaFunct.txt";
+        private const string EXPECTEDFREQUENCIES = "FilesForUse\\EnglishLetterDistribution.txt";
         private const int OPTIMALN = 100;
         private const int LETTERSINALPHABET = 26;
         private const int NUMINTERVALS = 1000;
@@ -105,7 +115,10 @@ namespace nea
             int numLetters = text.Count(c => "abcdefghijklmnopqrstuvwxyz".Contains(char.ToLower(c)));
 
             double[] expectedFreqs = new double[LETTERSINALPHABET];
-            for (int i = 0; i < LETTERSINALPHABET; i++) expectedFreqs[i] = expectedEngDistribution[i] * OPTIMALN;
+            for (int i = 0; i < LETTERSINALPHABET; i++)
+            {
+                expectedFreqs[i] = expectedEngDistribution[i] * OPTIMALN;
+            }
 
             double[] observedFreqs = new double[LETTERSINALPHABET];
             for (int i = 0; i < LETTERSINALPHABET; i++)
@@ -116,7 +129,10 @@ namespace nea
             (double[] combinedObsFreqs, double[] combinedExpFreqs) = Statistics.CombineChiSquaredClasses(observedFreqs, expectedFreqs, OPTIMALN);
 
             int degFreedom = combinedObsFreqs.Length - 1;
-            if (degFreedom == 0) throw new Exception("Text too short: insufficient information to classify.");
+            if (degFreedom == 0)
+            {
+                throw new Exception("Text too short: insufficient information to classify.");
+            }
 
             double pValue = Statistics.GetPValue(combinedObsFreqs, combinedExpFreqs, degFreedom, NUMINTERVALS, LookupGammaFunct);
 
@@ -127,8 +143,8 @@ namespace nea
 
     public class WordLength : IClassifier
     {
-        private const string GAMMAFUNCTLOOKUP = "C:\\Users\\betha\\Code\\nea\\nea\\LookupGammaFunct.txt";
-        private const string EXPECTEDLENGTHS = "C:\\Users\\betha\\Code\\nea\\nea\\ExpectedWordLengths.txt";
+        private const string GAMMAFUNCTLOOKUP = "FilesForUse\\LookupGammaFunct.txt";
+        private const string EXPECTEDLENGTHS = "FilesForUse\\ExpectedWordLengths.txt";
         private const int MAXENGWORDLENGTH = 20;
         private const int OPTIMALN = 100;
         private const int NUMINTERVALS = 1000;
@@ -177,14 +193,23 @@ namespace nea
                     if (currentWordLength != 0)
                     {
 
-                        if (currentWordLength <= MAXENGWORDLENGTH) observedFreqs[currentWordLength - 1]++;
-                        else observedFreqs[MAXENGWORDLENGTH]++;
+                        if (currentWordLength <= MAXENGWORDLENGTH)
+                        {
+                            observedFreqs[currentWordLength - 1]++;
+                        }
+                        else
+                        {
+                            observedFreqs[MAXENGWORDLENGTH]++;
+                        }
                         currentWordLength = 0;
                         numWords++;
                     }
                 }
             }
-            if (currentWordLength != 0) observedFreqs[currentWordLength - 1]++;
+            if (currentWordLength != 0)
+            {
+                observedFreqs[currentWordLength - 1]++;
+            }
             for (int i = 0; i < MAXENGWORDLENGTH + 1; i++)
             {
                 observedFreqs[i] *= ((double)OPTIMALN / numWords);
@@ -193,7 +218,10 @@ namespace nea
             (double[] combinedObsFreqs, double[] combinedExpFreqs) = Statistics.CombineChiSquaredClasses(observedFreqs, expectedFreqs, OPTIMALN);
 
             int degFreedom = combinedObsFreqs.Length - 1;
-            if (degFreedom == 0) throw new Exception("Text too short: insufficient information to classify.");
+            if (degFreedom == 0)
+            {
+                throw new Exception("Text too short: insufficient information to classify.");
+            }
 
             double pValue = Statistics.GetPValue(combinedObsFreqs, combinedExpFreqs, degFreedom, NUMINTERVALS, LookupGammaFunct);
 
@@ -204,8 +232,8 @@ namespace nea
 
     public class Bigrams : IClassifier
     {
-        private const string GAMMAFUNCTLOOKUP = "C:\\Users\\betha\\Code\\nea\\nea\\LookupGammaFunct.txt";
-        private const string COMMONBIGRAMS = "C:\\Users\\betha\\Code\\nea\\nea\\CommonBigrams.txt";
+        private const string GAMMAFUNCTLOOKUP = "FilesForUse\\LookupGammaFunct.txt";
+        private const string COMMONBIGRAMS = "FilesForUse\\CommonBigrams.txt";
         private const int NUMBIGRAMSINFILE = 50;
         private const int OPTIMALN = 100;
         private const int NUMINTERVALS = 1000;
@@ -242,7 +270,10 @@ namespace nea
 
             for (int i = 0; i < text.Length - 1; i++)
             {
-                if (!(char.IsLetter(text[i]) && char.IsLetter(text[i + 1]))) continue;
+                if (!(char.IsLetter(text[i]) && char.IsLetter(text[i + 1])))
+                {
+                    continue;
+                }
 
                 string bigram = text[i].ToString() + text[i + 1].ToString();
                 numBigrams++;
@@ -251,25 +282,37 @@ namespace nea
                 {
                     bigramsExpAndObs[bigram.ToUpper()] = (bigramsExpAndObs[bigram.ToUpper()].Item1, bigramsExpAndObs[bigram.ToUpper()].Item2 + 1);
                 }
-                else bigramsExpAndObs["OTHER"] = (bigramsExpAndObs["OTHER"].Item1, bigramsExpAndObs["OTHER"].Item2 + 1);
+                else
+                {
+                    bigramsExpAndObs["OTHER"] = (bigramsExpAndObs["OTHER"].Item1, bigramsExpAndObs["OTHER"].Item2 + 1);
+                }
             }
 
             double[] expectedFreqs = new double[NUMBIGRAMSINFILE + 1];
             double[] observedFreqs = new double[NUMBIGRAMSINFILE + 1];
 
             int j = 0;
-            foreach (KeyValuePair<string, (double, int)> kvp in  bigramsExpAndObs)
+            foreach (KeyValuePair<string, (double, int)> kvp in bigramsExpAndObs)
             {
                 expectedFreqs[j] = kvp.Value.Item1 * OPTIMALN;
-                if (numBigrams == 0) observedFreqs[j] = 0;
-                else observedFreqs[j] = kvp.Value.Item2 * ((double) OPTIMALN / numBigrams);
+                if (numBigrams == 0)
+                {
+                    observedFreqs[j] = 0;
+                }
+                else
+                {
+                    observedFreqs[j] = kvp.Value.Item2 * ((double)OPTIMALN / numBigrams);
+                }
                 j++;
             }
 
             (double[] combinedObsFreqs, double[] combinedExpFreqs) = Statistics.CombineChiSquaredClasses(observedFreqs, expectedFreqs, OPTIMALN);
 
             int degFreedom = combinedObsFreqs.Length - 1;
-            if (degFreedom == 0) throw new Exception("Text too short: insufficient information to classify.");
+            if (degFreedom == 0)
+            {
+                throw new Exception("Text too short: insufficient information to classify.");
+            }
 
             double pValue = Statistics.GetPValue(combinedObsFreqs, combinedExpFreqs, degFreedom, NUMINTERVALS, LookupGammaFunct);
 
@@ -303,13 +346,22 @@ namespace nea
             for (int i = 0; i < occurrences.Length; i++)
             {
                 double p = (double) occurrences[i] / text.Length;
-                if (p != 0) entropy += p * Math.Log(p, 2);
+                if (p != 0)
+                {
+                    entropy += p * Math.Log(p, 2);
+                }
             }
 
             entropy = - entropy;
 
-            if (entropy <= CLOSETOENGLISH) probability = 1 - (CLOSETOENGLISH - entropy) / CLOSETOENGLISH;
-            else probability = 1 - (entropy - CLOSETOENGLISH) / (MAXENTROPY - CLOSETOENGLISH);
+            if (entropy <= CLOSETOENGLISH)
+            {
+                probability = 1 - (CLOSETOENGLISH - entropy) / CLOSETOENGLISH;
+            }
+            else
+            {
+                probability = 1 - (entropy - CLOSETOENGLISH) / (MAXENTROPY - CLOSETOENGLISH);
+            }
 
             return probability;
         }
@@ -341,5 +393,35 @@ namespace nea
 
     }
 
+
+    class ClassifierFactory
+    {
+        public static IClassifier GetClassifier(string classifierType, ICipher cipher)
+        {
+            switch (classifierType)
+            {
+                case "RandomGuesser":
+                    return new RandomGuesser();
+                case "ProportionPrintable":
+                    return new ProportionPrintable();
+                case "DictionaryLookup":
+                    return new DictionaryLookup();
+                case "FrequencyAnalysis":
+                    return new FrequencyAnalysis();
+                case "Bigrams":
+                    return new Bigrams();
+                case "WordLength":
+                    return new WordLength();
+                case "Entropy":
+                    return new Entropy();
+                case "MajorityVoteEnsemble":
+                    IClassifier[] classifiers = new IClassifier[] { new RandomGuesser(), new ProportionPrintable(), new DictionaryLookup(), new FrequencyAnalysis(), new Entropy() };
+                    MajVoting trainer = new MajVoting();
+                    return new Ensemble(classifiers, trainer.GetWeights(classifiers, cipher));
+                default:
+                    throw new Exception("No valid classifier selected");
+            }
+        }
+    }
 
 }
