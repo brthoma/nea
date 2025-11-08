@@ -1,6 +1,8 @@
 ﻿using Microsoft.SqlServer.Server;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -278,6 +280,7 @@ namespace nea
     public class XORCryptanalysis : ICryptanalysis
     {
         private const double IOTTHRESHOLD = 0.06; //This is ~ 1.5 / 26 but will need to justify this in writeup
+        private const int MAXKEYLENGTH = 6; //also try to maybe justify
 
         private string[] GetSlices(string text, int numSlices)
         {
@@ -285,10 +288,7 @@ namespace nea
 
             for (int i = 0; i < text.Length; i++)
             {
-                if (char.IsLetter(text[i]))
-                {
-                    slices[i % numSlices] += text[i];
-                }
+                slices[i % numSlices] += text[i];
             }
 
             return slices;
@@ -323,7 +323,10 @@ namespace nea
         }
         private IEnumerable<(int, string[])> GetLikelyKeyLength(string text)
         {
-            for (int i = 1; i < text.Length; i++)
+            List<int> keyLengths = new List<int>();
+            List<double> IoCValues = new List<double>();
+
+            for (int i = 1; i < MAXKEYLENGTH; i++)
             {
                 double totalIoC = 0;
 
@@ -334,31 +337,43 @@ namespace nea
                     totalIoC += CalcIdxOfCoincidence(slice);
                 }
 
+                keyLengths.Add(i);
+                IoCValues.Add(totalIoC / i);
+
                 if (totalIoC / i > IOTTHRESHOLD)
                 {
                     yield return (i, slices);
                 }
             }
+
+            while(keyLengths.Count() > 0)
+            {
+                int idx = IoCValues.IndexOf(IoCValues.Max());
+                int keyLength = keyLengths[idx];
+                IoCValues.RemoveAt(idx);
+                keyLengths.RemoveAt(idx);
+                yield return (keyLength, GetSlices(text, keyLength));
+            }
         }
 
-        private IEnumerable<int> GetSingleKey(string slice, int attempts = 26)
+        private IEnumerable<char> GetSingleKey(string slice, int attempts = 26)
         {
             XOR cipher = new XOR();
             IClassifier classifier = new FrequencyAnalysis();
 
-            List<int> keys = new List<int>();
+            List<char> keys = new List<char>();
             List<double> pvalues = new List<double>();
 
-            for (int i = 0; i < 26; i++)
+            for (char c = 'A'; c <= 'Z'; c++)
             {
-                double pvalue = classifier.Classify(cipher.Decrypt(slice, BitConverter.GetBytes(i)));
-                keys.Add(i);
+                double pvalue = classifier.Classify(cipher.Decrypt(slice, BitConverter.GetBytes(c)));
+                keys.Add(c);
                 pvalues.Add(pvalue);
             }
             for (int i = 0; i < attempts; i++)
             {
                 int idx = pvalues.IndexOf(pvalues.Max());
-                int key = keys[idx];
+                char key = keys[idx];
                 pvalues.RemoveAt(idx);
                 keys.RemoveAt(idx);
                 yield return key;
@@ -369,9 +384,9 @@ namespace nea
         {
             Console.WriteLine(idxInKey);
 
-            foreach (int intKeyChar in GetSingleKey(slices[idxInKey], 10))
+            foreach (char keyChar in GetSingleKey(slices[idxInKey], 10))
             {
-                char keyChar = (char)((intKeyChar % 26 + 26) % 26 + 'A');
+                //char keyChar = (char)((intKeyChar % 26 + 26) % 26 + 'A');
 
                 if (idxInKey == keyLength - 1)
                 {
