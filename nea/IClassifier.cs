@@ -56,11 +56,49 @@ namespace nea
     public class DictionaryLookup : IClassifier
     {
         private const string DICTIONARYFILEPATH = "FilesForUse\\EnglishDictionary.txt";
+        private string[] dictionary;
+
+        public DictionaryLookup()
+        {
+            dictionary = File.ReadAllLines(DICTIONARYFILEPATH);
+
+            for (int i = 0; i < dictionary.Length; i++)
+            {
+                dictionary[i] = dictionary[i].ToLower();
+            }
+
+            Array.Sort(dictionary);
+        }
+
+        private bool BinarySearch(string target)
+        {
+            int start = 0;
+            int end = dictionary.Length - 1;
+
+            while (start <= end)
+            {
+                int middle = (start + end) / 2;
+
+                int comparison = String.Compare(dictionary[middle], target, comparisonType : StringComparison.OrdinalIgnoreCase);
+                if (comparison == 0)
+                {
+                    return true;
+                }
+                else if (comparison < 0)
+                {
+                    start = middle + 1;
+                }
+                else
+                {
+                    end = middle - 1;
+                }
+            }
+            return false;
+        }
 
         public double Classify(string text)
         {
             int inDictionary = 0;
-            string[] dictionary = File.ReadAllLines(DICTIONARYFILEPATH);
             int numWords = 0;
 
 
@@ -68,7 +106,7 @@ namespace nea
             {
                 string word = match.Value;
                 numWords++;
-                if (dictionary.Contains(word, StringComparer.OrdinalIgnoreCase))
+                if (BinarySearch(word))
                 {
                     inDictionary++;
                 }
@@ -206,7 +244,7 @@ namespace nea
                     }
                 }
             }
-            if (currentWordLength != 0)
+            if (currentWordLength != 0 && currentWordLength <= MAXENGWORDLENGTH)
             {
                 observedFreqs[currentWordLength - 1]++;
             }

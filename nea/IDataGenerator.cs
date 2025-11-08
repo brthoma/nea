@@ -55,6 +55,15 @@ namespace nea
         {
             int randomStart = random.Next(corpus.Length - length);
             string text = corpus.Substring(randomStart, length);
+            List<char> unprintables = new List<char>();
+
+            for (int i = 0; i < length; i++)
+            {
+                if (char.IsControl(text[i]) || char.IsSurrogate(text[i]))
+                {
+                    text = text.Replace(text[i], ' ');
+                }
+            }
 
             return text;
         }
