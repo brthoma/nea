@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace nea
@@ -107,6 +108,7 @@ namespace nea
     public class VigenereCryptanalysis : ICryptanalysis
     {
         private const double IOTTHRESHOLD = 1.5;
+        private const int MAXKEYLENGTH = 6; //JUSTIFYYYY
 
         private string[] GetSlices(string text, int numSlices)
         {
@@ -155,7 +157,7 @@ namespace nea
 
         private IEnumerable<(int, string[])> GetLikelyKeyLength(string text)
         {
-            for (int i = 1; i < text.Length; i++)
+            for (int i = 1; i < MAXKEYLENGTH; i++)
             {
                 double totalIoC = 0;
 
@@ -240,6 +242,7 @@ namespace nea
     {
 
         private const string ORDEROFFREQUENCY = "etaoinsrhldcumfpgwybvkxjqz";
+        private const double THRESHOLD = 0.98;
 
         public string GetCharFreqs(string text)
         {
@@ -262,6 +265,21 @@ namespace nea
 
             return orderOfFreqsInText;
         }
+        private string RandomSwap(string key, Random random)
+        {
+            int idx1 = random.Next(0, key.Length);
+            int idx2;
+            do
+            {
+                idx2 = random.Next(0, key.Length);
+            } while (idx1 == idx2);
+            if (idx1 > idx2)
+            {
+                (idx1, idx2) = (idx2, idx1);
+            }
+            string newKey = key.Substring(0, idx1) + key[idx2] + key.Substring(idx1 + 1, idx2 - idx1 - 1) + key[idx1] + key.Substring(idx2 + 1);
+            return newKey;
+        }
 
         public IEnumerable<byte[]> GetKeys(string text)
         {
@@ -273,8 +291,70 @@ namespace nea
                 key += freqsInText[ORDEROFFREQUENCY.IndexOf(letter)];
             }
 
+            IClassifier classifier = new ClosenessToDictionary();
+            ICipher cipher = new Substitution();
+            Random random = new Random();
+            int numSwaps = 1000;
+            string decryptedText = cipher.Decrypt(text, Encoding.UTF8.GetBytes(key));
+            double classification = classifier.Classify(decryptedText);
+
+            for (int i = 0; i < numSwaps; i++)
+            {
+                string newKey = RandomSwap(key, random);
+                string decrypted = cipher.Decrypt(text, Encoding.UTF8.GetBytes(newKey));
+                double newClassification = classifier.Classify(decrypted);
+                if (newClassification > classification)
+                {
+                    key = newKey;
+                    classification = newClassification;
+                }
+
+                if (classification > THRESHOLD)
+                {
+                    Console.WriteLine(key);
+                    Console.WriteLine(classification);
+                    Console.WriteLine(cipher.Decrypt(text, Encoding.UTF8.GetBytes(key)));
+                    yield return Encoding.UTF8.GetBytes(key);
+                }
+            }
+
+            Console.WriteLine(key);
+            Console.WriteLine(classification);
+            Console.WriteLine(cipher.Decrypt(text, Encoding.UTF8.GetBytes(key)));
             yield return Encoding.UTF8.GetBytes(key);
+
         }
+
+        private List<char> FindOneLetterWords(string text)
+        {
+            List<char> oneLetterWords = new List<char>();
+            foreach (Match match in Regex.Matches(text, "[a-zA-Z]+"))
+            {
+                string word = match.Value;
+                if (word.Length == 1)
+                {
+                    oneLetterWords.Add(word[0]);
+                }
+            }
+            return oneLetterWords;
+        }
+
+        private List<char[]> PairsOfOneLetterWords(List<char> oneLetterWords)
+        {
+            List<char[]> pairs = new List<char[]>();
+            for (int i = 0; i < oneLetterWords.Count(); i++)
+            {
+                for (int j = 0; j < oneLetterWords.Count(); j++)
+                {
+                    if (i != j)
+                    {
+                        pairs.Add(new char[] { oneLetterWords[i], oneLetterWords[j] });
+                    }
+                }
+            }
+            return pairs;
+        }
+
     }
 
     public class XORCryptanalysis : ICryptanalysis

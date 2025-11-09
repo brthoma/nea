@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -194,6 +195,11 @@ namespace nea
 
     }
 
+
+    /* Returns a value in the range 0-1 indicating how close the distribution of word lengths
+     * are to those in English text. Calculates Chi-Squared statistic in order to compare
+     * the results from different pieces of text
+     */
     public class WordLength : IClassifier
     {
         private const string GAMMAFUNCTLOOKUP = "FilesForUse\\LookupGammaFunct.txt";
@@ -287,6 +293,10 @@ namespace nea
 
     }
 
+    /* Returns a number in the range 0-1 indicating how close the distribution of bigrams
+     * in the text ist to the distribution in English text. Returns a Chi-Squared statistic
+     * in order to compare the results with different pieces of text
+     */
     public class Bigrams : IClassifier
     {
         private const string GAMMAFUNCTLOOKUP = "FilesForUse\\LookupGammaFunct.txt";
@@ -379,11 +389,16 @@ namespace nea
 
     }
 
+    /* Returns a value indicating the randomness of the text. Completely random text is
+     * expected to give a high entropy, whereas text containing a lot of repeated letters
+     * will give a low entropy. English text has an average entropy of 4.14, so the
+     * text can be compared to English by comparing the entropy value with 4.14
+     */
     public class Entropy : IClassifier
     {
         private const int MINRANGE = 32;
         private const int MAXRANGE = 126;
-        private const double CLOSETOENGLISH = 4.25;
+        private const double CLOSETOENGLISH = 4.14;
         private const double MAXENTROPY = 8.0;
 
         public double Classify(string text)
@@ -425,6 +440,8 @@ namespace nea
 
     }
 
+    /* Returns a weighted average of the classifier outputs
+     */
     public class Ensemble : IClassifier
     {
         private IClassifier[] classifiers;
@@ -450,7 +467,85 @@ namespace nea
 
     }
 
+    /* Returns a value in the range 0-1 which indicates the average number of characters
+     * each word is from the closest dictionary word (in terms of Edit distance)
+     */
+    public class ClosenessToDictionary : IClassifier
+    {
+        private const string DICTIONARYFILEPATH = "FilesForUse\\EnglishDictionary.txt";
+        private string[] dictionary;
+        private Dictionary<int, List<string>> dictionaries;
 
+        public ClosenessToDictionary()
+        {
+            dictionary = File.ReadAllLines(DICTIONARYFILEPATH);
+            dictionaries = new Dictionary<int, List<string>>();
+
+            for (int i = 0; i < dictionary.Length; i++)
+            {
+                int wordLength = dictionary[i].Length;
+
+                if (!dictionaries.ContainsKey(wordLength))
+                {
+                    dictionaries.Add(wordLength, new List<string>());
+                }
+                dictionaries[wordLength].Add(dictionary[i].ToLower());
+            }
+        }
+
+        private int EditDistance(string word1, string word2)
+        {
+            word1 = word1.ToLower();
+            word2 = word2.ToLower();
+            int numSubstitutions = 0;
+            for (int i = 0; i < word1.Length; i++)
+            {
+                if (word1[i] != word2[i])
+                {
+                    numSubstitutions++;
+                }
+            }
+            return numSubstitutions;
+        }
+
+        public double Classify(string text)
+        {
+            int closeness = 0;
+            int totalWordLengths = 0;
+
+            foreach (Match match in Regex.Matches(text, "[a-zA-Z]+"))
+            {
+                string word = match.Value;
+                int bestCloseness = 0;
+
+                if (!dictionaries.ContainsKey(word.Length))
+                {
+                    totalWordLengths += word.Length;
+                    continue;
+                }
+
+                foreach (string dictWord in dictionaries[word.Length])
+                {
+                    int editDistance = EditDistance(word, dictWord);
+                    if (word.Length - editDistance > bestCloseness)
+                    {
+                        bestCloseness = word.Length - editDistance;
+                    }
+                    if (editDistance == 0)
+                    {
+                        break;
+                    }
+                }
+                closeness += bestCloseness;
+                totalWordLengths += word.Length;
+            }
+
+            return (double)closeness / totalWordLengths;
+        }
+    }
+
+    /* Returns the classifier object associated with the classifier type passed in
+     */
     class ClassifierFactory
     {
         public static IClassifier GetClassifier(string classifierType, ICipher cipher)
