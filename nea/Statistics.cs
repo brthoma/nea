@@ -8,6 +8,15 @@ namespace nea
 {
     internal class Statistics
     {
+        public static double[] ScaleFrequencies(double[] frequencies, int scaleTo)
+        {
+            double scaleFrom = frequencies.Sum();
+            for (int i = 0; i < frequencies.Length; i++)
+            {
+                frequencies[i] *= scaleTo / scaleFrom;
+            }
+            return frequencies;
+        }
 
         public static (double[], double[]) CombineChiSquaredClasses(double[] observedFreqs, double[] expectedFreqs, int optimalN)
         {

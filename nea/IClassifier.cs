@@ -21,7 +21,8 @@ namespace nea
         double Classify(string text);
     }
 
-
+    /*Return a random value in the range 0-1
+     */
     public class RandomGuesser : IClassifier
     {
 
@@ -33,6 +34,8 @@ namespace nea
 
     }
 
+    /* Returns the proportion of characters in the text which are printable
+     */
     public class ProportionPrintable : IClassifier
     {
 
@@ -53,6 +56,9 @@ namespace nea
 
     }
 
+    /* Returns the proportion of words (series of consecutive alphabetical characters)
+     * which are in the dictionary
+     */
     public class DictionaryLookup : IClassifier
     {
         private const string DICTIONARYFILEPATH = "FilesForUse\\EnglishDictionary.txt";
@@ -112,10 +118,19 @@ namespace nea
                 }
             }
 
+            if (numWords == 0)
+            {
+                return 0;
+            }
+
             return (double) inDictionary / numWords;
         }
     }
 
+    /* Returns a number in the range 0-1 indicating how close the character frequencies
+     * of the text are to the expected character frequencies for English text
+     * Calculates the Chi-Squared statistic in order to compare different text
+     */
     public class FrequencyAnalysis : IClassifier
     {
         private const string GAMMAFUNCTLOOKUP = "FilesForUse\\LookupGammaFunct.txt";
@@ -186,8 +201,10 @@ namespace nea
         private const int MAXENGWORDLENGTH = 20;
         private const int OPTIMALN = 100;
         private const int NUMINTERVALS = 1000;
+
         private Dictionary<double, double> LookupGammaFunct = new Dictionary<double, double>();
         private double[] expectedEngDistribution = new double[MAXENGWORDLENGTH + 1];
+        private double[] expectedFreqs = new double[MAXENGWORDLENGTH + 1];
 
         public WordLength()
         {
@@ -209,20 +226,18 @@ namespace nea
                 }
                 sr.Close();
             }
+
+            expectedFreqs = Statistics.ScaleFrequencies(expectedEngDistribution, OPTIMALN);
         }
 
-        public double Classify(string text)
+        private double[] GetObservedFreqs(string text)
         {
-            int numWords = 0;
-
-            double[] expectedFreqs = new double[MAXENGWORDLENGTH + 1];
-            for (int i = 0; i < MAXENGWORDLENGTH + 1; i++) expectedFreqs[i] = expectedEngDistribution[i] * OPTIMALN;
-
             double[] observedFreqs = new double[MAXENGWORDLENGTH + 1];
             int currentWordLength = 0;
+
             for (int i = 0; i < text.Length; i++)
             {
-                if (char.IsLetter(text[i]))
+                if (!char.IsWhiteSpace(text[i]))
                 {
                     currentWordLength++;
                 }
@@ -240,7 +255,6 @@ namespace nea
                             observedFreqs[MAXENGWORDLENGTH]++;
                         }
                         currentWordLength = 0;
-                        numWords++;
                     }
                 }
             }
@@ -248,10 +262,15 @@ namespace nea
             {
                 observedFreqs[currentWordLength - 1]++;
             }
-            for (int i = 0; i < MAXENGWORDLENGTH + 1; i++)
-            {
-                observedFreqs[i] *= ((double)OPTIMALN / numWords);
-            }
+
+            observedFreqs = Statistics.ScaleFrequencies(observedFreqs, OPTIMALN);
+
+            return observedFreqs;
+        }
+
+        public double Classify(string text)
+        {
+            double[] observedFreqs = GetObservedFreqs(text);
 
             (double[] combinedObsFreqs, double[] combinedExpFreqs) = Statistics.CombineChiSquaredClasses(observedFreqs, expectedFreqs, OPTIMALN);
 

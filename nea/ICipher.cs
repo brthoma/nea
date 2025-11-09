@@ -252,7 +252,7 @@ namespace nea
 
             foreach (char c in plaintext)
             {
-                if (!char.IsLetter(c))
+                if (!"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".Contains(c))
                 {
                     ciphertext += c;
                     continue;
