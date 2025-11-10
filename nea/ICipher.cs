@@ -146,6 +146,7 @@ namespace nea
         
         private const int RANGE = 'Z' - 'A';
         private const int DEFAULTKEYLENGTH = 2;
+        private const string ALPHABET = "abcdefghijklmnopqrstuvwxyz";
 
         public byte[] GetRandomKey(Random random, int length)
         {
@@ -178,7 +179,7 @@ namespace nea
 
             foreach (char c in plaintext)
             {
-                if (char.IsLetter(c))
+                if (ALPHABET.Contains(char.ToLower(c)))
                 {
                     ciphertext += rot13.Encrypt(c.ToString(), BitConverter.GetBytes(keyArr[keyIdx]));
                     keyIdx = (keyIdx + 1) % key.Length;
@@ -209,10 +210,11 @@ namespace nea
     public class Substitution : ICipher
     {
         private const int RANGE = 'z' - 'a';
+        private const string ALPHABET = "abcdefghijklmnopqrstuvwxyz";
 
         public byte[] GetRandomKey(Random random)
         {
-            string alphabet = "abcdefghijklmnopqrstuvwxyz";
+            string alphabet = ALPHABET;
             string key = "";
             
             for (int i = 0; i <= RANGE; i++)
@@ -252,7 +254,7 @@ namespace nea
 
             foreach (char c in plaintext)
             {
-                if (!"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".Contains(c))
+                if (!ALPHABET.Contains(char.ToLower(c)))
                 {
                     ciphertext += c;
                     continue;
@@ -270,7 +272,7 @@ namespace nea
 
             foreach (char c in ciphertext)
             {
-                if (!char.IsLetter(c))
+                if (!ALPHABET.Contains(char.ToLower(c)))
                 {
                     plaintext += c;
                     continue;

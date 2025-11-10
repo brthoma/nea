@@ -109,6 +109,7 @@ namespace nea
     {
         private const double IOTTHRESHOLD = 1.5;
         private const int MAXKEYLENGTH = 6; //JUSTIFYYYY
+        private const string ALPHABET = "abcdefghijklmnopqrstuvwxyz";
 
         private string[] GetSlices(string text, int numSlices)
         {
@@ -117,7 +118,7 @@ namespace nea
 
             for (int i = 0; i < text.Length; i++)
             {
-                if (char.IsLetter(text[i]))
+                if (ALPHABET.Contains(char.ToLower(text[i])))
                 {
                     slices[keyIdx] += text[i];
                     keyIdx = (keyIdx + 1) % numSlices;
@@ -133,7 +134,7 @@ namespace nea
 
             foreach (char c in text)
             {
-                if (!textCounts.ContainsKey(c) && char.IsLetter(c))
+                if (!textCounts.ContainsKey(c) && ALPHABET.Contains(char.ToLower(c)))
                 {
                     textCounts.Add(c, text.Count(chr => chr == c));
                 }
@@ -242,7 +243,7 @@ namespace nea
     {
 
         private const string ORDEROFFREQUENCY = "etaoinsrhldcumfpgwybvkxjqz";
-        private const double THRESHOLD = 0.98;
+        private const string ALPHABET = "abcdefghijklmnopqrstuvwxyz";
 
         public string GetCharFreqs(string text)
         {
@@ -250,7 +251,7 @@ namespace nea
             Dictionary<char, int> freqs = new Dictionary<char, int>();
             string lowerText = text.ToLower();
 
-            foreach (char letter in "abcdefghijklmnopqrstuvwxyz")
+            foreach (char letter in ALPHABET)
             {
                 freqs.Add(letter, lowerText.Count(c => c == letter));
             }
@@ -286,7 +287,7 @@ namespace nea
             string freqsInText = GetCharFreqs(text);
             string key = "";
 
-            foreach (char letter in "abcdefghijklmnopqrstuvwxyz")
+            foreach (char letter in ALPHABET)
             {
                 key += freqsInText[ORDEROFFREQUENCY.IndexOf(letter)];
             }
@@ -309,13 +310,6 @@ namespace nea
                     classification = newClassification;
                 }
 
-                if (classification > THRESHOLD)
-                {
-                    Console.WriteLine(key);
-                    Console.WriteLine(classification);
-                    Console.WriteLine(cipher.Decrypt(text, Encoding.UTF8.GetBytes(key)));
-                    yield return Encoding.UTF8.GetBytes(key);
-                }
             }
 
             Console.WriteLine(key);

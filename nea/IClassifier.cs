@@ -139,6 +139,7 @@ namespace nea
         private const int OPTIMALN = 100;
         private const int LETTERSINALPHABET = 26;
         private const int NUMINTERVALS = 1000;
+        private const string ALPHABET = "abcdefghijklmnopqrstuvwxyz";
         private Dictionary<double, double> LookupGammaFunct = new Dictionary<double, double>();
         private double[] expectedEngDistribution = new double[LETTERSINALPHABET];
 
@@ -166,7 +167,7 @@ namespace nea
 
         public double Classify(string text)
         {
-            int numLetters = text.Count(c => "abcdefghijklmnopqrstuvwxyz".Contains(char.ToLower(c)));
+            int numLetters = text.Count(c => ALPHABET.Contains(char.ToLower(c)));
 
             double[] expectedFreqs = new double[LETTERSINALPHABET];
             for (int i = 0; i < LETTERSINALPHABET; i++)
@@ -301,9 +302,10 @@ namespace nea
     {
         private const string GAMMAFUNCTLOOKUP = "FilesForUse\\LookupGammaFunct.txt";
         private const string COMMONBIGRAMS = "FilesForUse\\CommonBigrams.txt";
-        private const int NUMBIGRAMSINFILE = 50;
+        private const int NUMBIGRAMSINFILE = 676;
         private const int OPTIMALN = 100;
         private const int NUMINTERVALS = 1000;
+        private const string ALPHABET = "abcdefghijklmnopqrstuvwxyz";
         private Dictionary<double, double> LookupGammaFunct = new Dictionary<double, double>();
         private Dictionary<string, (double, int)> bigramsExpAndObs = new Dictionary<string, (double, int)>();
 
@@ -322,7 +324,7 @@ namespace nea
 
             using (StreamReader sr = new StreamReader(COMMONBIGRAMS))
             {
-                for (int i = 0; i < NUMBIGRAMSINFILE + 1; i++)
+                while (!sr.EndOfStream)
                 {
                     string[] bigramFreq = sr.ReadLine().Trim().Split('|');
                     bigramsExpAndObs.Add(bigramFreq[0], (double.Parse(bigramFreq[1]), 0));
@@ -337,7 +339,7 @@ namespace nea
 
             for (int i = 0; i < text.Length - 1; i++)
             {
-                if (!(char.IsLetter(text[i]) && char.IsLetter(text[i + 1])))
+                if (!(ALPHABET.Contains(char.ToLower(text[i])) && ALPHABET.Contains(char.ToLower(text[i + 1]))))
                 {
                     continue;
                 }
@@ -345,18 +347,11 @@ namespace nea
                 string bigram = text[i].ToString() + text[i + 1].ToString();
                 numBigrams++;
 
-                if (bigramsExpAndObs.ContainsKey(bigram.ToUpper()))
-                {
-                    bigramsExpAndObs[bigram.ToUpper()] = (bigramsExpAndObs[bigram.ToUpper()].Item1, bigramsExpAndObs[bigram.ToUpper()].Item2 + 1);
-                }
-                else
-                {
-                    bigramsExpAndObs["OTHER"] = (bigramsExpAndObs["OTHER"].Item1, bigramsExpAndObs["OTHER"].Item2 + 1);
-                }
+                bigramsExpAndObs[bigram.ToUpper()] = (bigramsExpAndObs[bigram.ToUpper()].Item1, bigramsExpAndObs[bigram.ToUpper()].Item2 + 1);
             }
 
-            double[] expectedFreqs = new double[NUMBIGRAMSINFILE + 1];
-            double[] observedFreqs = new double[NUMBIGRAMSINFILE + 1];
+            double[] expectedFreqs = new double[NUMBIGRAMSINFILE];
+            double[] observedFreqs = new double[NUMBIGRAMSINFILE];
 
             int j = 0;
             foreach (KeyValuePair<string, (double, int)> kvp in bigramsExpAndObs)
