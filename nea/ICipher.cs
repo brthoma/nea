@@ -12,18 +12,31 @@ using System.Threading.Tasks;
 namespace nea
 {
 
+    /* Interface definition for a Cipher class
+     * Derived classes encrypt and decrypt text according to their algorithms
+     */
     public interface ICipher
     {
+        /* Returns a randomly generated key appropriate for the cipher
+         */
         byte[] GetRandomKey(Random random);
+
+        /* Encrypts the text
+         */
         string Encrypt(string plaintext, byte[] key);
+
+        /* Decrypts the text
+         */
         string Decrypt(string ciphertext, byte[] key);
     }
 
 
+    /* Bitwise XOR cipher
+     */
     public class XOR : ICipher
     {
 
-        private const int DEFAULTKEYLENGTH = 2;
+        private const int MAXIMUMKEYLENGTH = 6;
 
         public byte[] GetRandomKey(Random random, int length)
         {
@@ -36,7 +49,7 @@ namespace nea
         }
         public byte[] GetRandomKey(Random random)
         {
-            return GetRandomKey(random, DEFAULTKEYLENGTH);
+            return GetRandomKey(random, random.Next(1, MAXIMUMKEYLENGTH));
         }
 
         public string Encrypt(string plaintext, byte[] bKey)
@@ -59,6 +72,8 @@ namespace nea
 
     }
 
+    /* ROT47 rotational cipher
+     */
     public class ROT47 : ICipher
     {
 
@@ -99,6 +114,8 @@ namespace nea
 
     }
 
+    /* ROT13 rotational cipher
+     */
     public class ROT13 : ICipher
     {
 
@@ -141,11 +158,13 @@ namespace nea
 
     }
 
+    /* Vigenere cipher
+     */
     public class Vigenere : ICipher
     {
         
         private const int RANGE = 'Z' - 'A';
-        private const int DEFAULTKEYLENGTH = 2;
+        private const int MAXKEYLENGTH = 6;
         private const string ALPHABET = "abcdefghijklmnopqrstuvwxyz";
 
         public byte[] GetRandomKey(Random random, int length)
@@ -159,7 +178,7 @@ namespace nea
         }
         public byte[] GetRandomKey(Random random)
         {
-            return GetRandomKey(random, DEFAULTKEYLENGTH);
+            return GetRandomKey(random, random.Next(1, MAXKEYLENGTH));
         }
 
         public string Encrypt(string plaintext, byte[] bKey)
@@ -207,6 +226,8 @@ namespace nea
         }
     }
 
+    /* Monoalphabetic substitution cipher
+     */
     public class Substitution : ICipher
     {
         private const int RANGE = 'z' - 'a';
@@ -285,6 +306,8 @@ namespace nea
 
     }
 
+    /* Returns the cipher object associated with the cipher type passed in
+     */
     class CipherFactory
     {
         public static ICipher GetCipher(string cipherType)

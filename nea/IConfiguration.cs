@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 namespace nea
 {
 
+    /* Interface definition for a Configuration class
+     * Derived classes return the test/demo parameters set at configuration
+     */
     public interface IConfiguration
     {
         string GetStr(string property);
@@ -22,7 +25,6 @@ namespace nea
         private string filePath, dataGenerator, cipher, classifier;
         private int textLength, iterations;
 
-        //Constructor: prompts user to input necessary test parameters
         public TestConfiguration()
         {
             filePath = "Data\\TestData\\" + UI.GetStringInput("Enter file name: ") + ".txt";
@@ -38,7 +40,6 @@ namespace nea
             classifier = UI.GetChoice(new string[] { "RandomGuesser", "ProportionPrintable", "DictionaryLookup", "FrequencyAnalysis", "Bigrams", "WordLength", "Entropy", "MajorityVoteEnsemble" }, "Choose classifier: ");
         }
 
-        //Constructor: produces a configuration based on the parameters passed in
         public TestConfiguration(string filePath, int textLength, int iterations, string dataGenerator, string cipher, string classifier)
         {
             this.filePath = filePath;
@@ -49,7 +50,6 @@ namespace nea
             this.classifier = classifier;
         }
 
-        //Returns the selected string property
         public string GetStr(string property)
         {
             switch (property)
@@ -67,7 +67,6 @@ namespace nea
             }
         }
 
-        //Returns the selected integer property
         public int GetInt(string property)
         {
             switch (property)
@@ -81,7 +80,6 @@ namespace nea
             }
         }
 
-        //TestConfiguration has no double properties, so this method will throw an error
         public double GetDouble(string property)
         {
             switch (property)
@@ -98,7 +96,6 @@ namespace nea
         private int textLength, iterations;
         private double threshold;
 
-        //Constructor: prompts user to input necessary demo parameters
         public DemoConfiguration()
         {
             filePath = "Data\\DemoData\\" + UI.GetStringInput("Enter file name: ") + ".txt";
@@ -115,7 +112,6 @@ namespace nea
 
             classifier = UI.GetChoice(new string[] { "RandomGuesser", "ProportionPrintable", "DictionaryLookup", "FrequencyAnalysis", "Bigrams", "WordLength", "Entropy", "MajorityVoteEnsemble" }, "Choose classifier: ");
 
-            //Permitted cryptanalysis method depends on cipher selected
             string cryptanalysisMessage = "Choose cryptanalysis method: ";
             switch (cipher)
             {
@@ -132,12 +128,11 @@ namespace nea
                     cryptanalysis = UI.GetChoice(new string[] { "VigenereCryptanalysis" }, cryptanalysisMessage);
                     break;
                 case "Substitution":
-                    cryptanalysis = UI.GetChoice(new string[] { "SubstitutionCryptanalysis" }, cryptanalysisMessage);
+                    cryptanalysis = UI.GetChoice(new string[] { "SubstitutionCryptanalysis", "FasterSubstitutionCryptanalysis" }, cryptanalysisMessage);
                     break;
             }
         }
 
-        //Constructor: produces a configuration based on the parameters passed in
         public DemoConfiguration(string filePath, int textLength, int iterations, double threshold, string dataGenerator, string cipher, string classifier, string cryptanalysis)
         {
             this.filePath = filePath;
@@ -150,7 +145,6 @@ namespace nea
             this.cryptanalysis = cryptanalysis;
         }
 
-        //Returns the selected string property
         public string GetStr(string property)
         {
             switch (property)
@@ -170,7 +164,6 @@ namespace nea
             }
         }
 
-        //Returns the selected integer property
         public int GetInt(string property)
         {
             switch (property)
@@ -184,7 +177,6 @@ namespace nea
             }
         }
 
-        //Returns the selected double property
         public double GetDouble(string property)
         {
             switch (property)

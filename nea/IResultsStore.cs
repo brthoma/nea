@@ -14,7 +14,7 @@ namespace nea
     public class TestResultsStore
     {
 
-        public const string TESTFILES = "FilesForUse\\TestFiles.txt";
+        public const string TESTFILES = "C:\\Users\\betha\\Code\\nea\\FilesForUse\\TestFiles.txt";
 
         public void SaveResults(IConfiguration config, double[] values, bool[] trueValues)
         {
@@ -79,7 +79,7 @@ namespace nea
     
     public class DemoResultsStore
     {
-        public const string DEMOFILES = "FilesForUse\\DemoFiles.txt";
+        public const string DEMOFILES = "C:\\Users\\betha\\Code\\nea\\FilesForUse\\DemoFiles.txt";
 
         public void SaveResults(IConfiguration config, bool[] success)
         {

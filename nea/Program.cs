@@ -12,24 +12,15 @@ namespace nea
 {
     internal class Program
     {
-        private const string TESTFILEPATH = "FilesForUse\\TestFiles.txt";
-        private const string DEMOFILEPATH = "FilesForUse\\DemoFiles.txt";
+        private const string TESTFILEPATH = "C:\\Users\\betha\\Code\\nea\\FilesForUse\\TestFiles.txt";
+        private const string DEMOFILEPATH = "C:\\Users\\betha\\Code\\nea\\FilesForUse\\DemoFiles.txt";
 
 
-        // Main menu: Choose mode and get configuration to pass into runners
+        /* Main menu: Choose mode and get configuration to pass into runners
+         */
 
         static void Main(string[] args)
         {
-
-            //Random random = new Random();
-
-            //ClosenessToDictionary editDist = new ClosenessToDictionary();
-
-            //Console.WriteLine(editDist.Classify("hello what is YOUR Name"));
-            //Console.WriteLine(editDist.Classify("btupendous"));
-            //Console.WriteLine(editDist.Classify("clt"));
-            //Console.WriteLine(editDist.Classify("this is nol a sentencg"));
-            //Console.ReadKey();
 
             bool cont = true;
 
@@ -45,8 +36,9 @@ namespace nea
                 string mode = UI.GetChoice(choices, "Choose a mode: ");
 
 
-                //Produce an IConfig object depending on the mode chosen and any parameters requiring entry
-                //Use a runner to run the chosen function
+                /* Produces an IConfig object depending on the mode chosen and any parameters requiring entry
+                 * Use a runner to run the chosen function
+                 */
                 switch (mode)
                 {
                     case "Test Classifiers":
@@ -118,7 +110,6 @@ namespace nea
 
             }
 
-            Console.ReadKey();
 
         }
     }

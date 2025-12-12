@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace nea
 {
+
+    /* Contains static methods used to get user input
+     */
     public class UI
     {
 

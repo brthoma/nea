@@ -9,14 +9,27 @@ using System.Threading.Tasks;
 namespace nea
 {
 
+    /* Interface definition for a Runner
+     * Derived classes perform functions
+     * Each derived class performs a different mode
+     */
     public interface IRunner
     {
         void Run(IConfiguration config);
     }
 
 
+    /* Classifier Test Runner
+     * Generates plaintext
+     * Randomly determines whether to encrypt the plaintext or not
+     * Passes the new text through a classifier
+     * Test has been successful if the classifier correctly classified the text as natural language or not
+     * Tes has been unsuccessful if the classifier incorrectly classified the text
+     * Results are stored in a text file
+     */
     public class ClassifierTestRunner : IRunner
     {
+
 
         public void Run(IConfiguration config)
         {
@@ -26,12 +39,14 @@ namespace nea
 
             IDataGenerator dataGenerator = DataGeneratorFactory.GetDataGenerator(config.GetStr("dataGenerator"));
             ICipher cipher = CipherFactory.GetCipher(config.GetStr("cipher"));
+            int iterations = config.GetInt("iterations");
 
-            double[] results = new double[config.GetInt("iterations")];
-            bool[] trueValues = new bool[config.GetInt("iterations")];
+            double[] results = new double[iterations];
+            bool[] trueValues = new bool[iterations];
 
-            for (int i = 0; i < config.GetInt("iterations"); i++)
+            for (int i = 0; i < iterations; i++)
             {
+
                 IClassifier classifier = ClassifierFactory.GetClassifier(config.GetStr("classifier"), cipher);
 
                 string text = dataGenerator.GenerateData(random, config.GetInt("textLength"));
@@ -47,13 +62,29 @@ namespace nea
                     trueValues[i] = true;
                 }
                 results[i] = classifier.Classify(text);
+
             }
 
             resultsStore.SaveResults(config, results, trueValues);
+
+            Console.WriteLine("Press any key to continue:");
+            Console.ReadKey();
         }
 
     }
 
+    /* Demonstration Runner
+     * Generates plaintext
+     * Encrypts text
+     * Cryptanalysis is used to cycle through possible keys
+     * For each key, the text is decrypted using that key and passed through a classifier
+     * If the text is classified as not natural language, the next key is checked
+     * If all keys returned by the cryptanalysis are tried and none are correct, then the test is unsuccessful
+     * If text is classified as natural language it is compared with the plaintext
+     * If the predicted text was correct, then the test was successful
+     * If not, it was unsuccessful
+     * Results are stored in a text file
+     */
     public class DemoRunner : IRunner
     {
 
@@ -65,15 +96,17 @@ namespace nea
 
             IDataGenerator dataGenerator = DataGeneratorFactory.GetDataGenerator(config.GetStr("dataGenerator"));
             ICipher cipher = CipherFactory.GetCipher(config.GetStr("cipher"));
+            int iterations = config.GetInt("iterations");
 
-            double[] results = new double[config.GetInt("iterations")];
-            bool[] trueValues = new bool[config.GetInt("iterations")];
+            double[] results = new double[iterations];
+            bool[] trueValues = new bool[iterations];
 
 
-            bool[] success = new bool[config.GetInt("iterations")];
+            bool[] success = new bool[iterations];
 
-            for (int i = 0; i < config.GetInt("iterations"); i++)
+            for (int i = 0; i < iterations; i++)
             {
+
                 IClassifier classifier = ClassifierFactory.GetClassifier(config.GetStr("classifier"), cipher);
                 ICryptanalysis cryptanalysis = CryptanalysisFactory.GetCryptanalysis(config.GetStr("cryptanalysis"));
 
@@ -85,21 +118,22 @@ namespace nea
                 foreach (byte[] key in cryptanalysis.GetKeys(ciphertext))
                 {
                     likelyPlaintext = cipher.Decrypt(ciphertext, key);
-                    if (classifier.Classify(likelyPlaintext) >= config.GetDouble("threshold"))
+                    double classification = classifier.Classify(likelyPlaintext);
+                    if (classification >= config.GetDouble("threshold"))
                     {
+                        Console.WriteLine("GUESS:");
                         Console.WriteLine(likelyPlaintext);
+                        Console.WriteLine();
+                        Console.WriteLine("CIPHERTEXT:");
                         Console.WriteLine(ciphertext);
+                        Console.WriteLine();
+
                         if (likelyPlaintext.ToLower() == plaintext.ToLower())
                         {
                             success[i] = true;
                         }
                         break;
                     }
-                }
-                if (success[i] == false)
-                {
-                    Console.WriteLine(plaintext);
-                    Console.ReadKey();
                 }
                 Console.WriteLine($"Success: {success[i]}");
             }
@@ -111,6 +145,15 @@ namespace nea
         }
     }
 
+    /* View Test Results Runner
+     * Reads in the test results from a text file
+     * Visually displays the results of the test to the user
+     * Displays 3 graphs to the user:
+     * - Threshold-success
+     * - ROC curve
+     * - DET curve
+     * Multiple sets of test results can be viewed at once
+     */
     public class ViewTestResultsRunner : IRunner
     {
         public void Run(IConfiguration config)
@@ -118,27 +161,28 @@ namespace nea
             TestResultsStore resultsStore = new TestResultsStore();
             ThresholdSuccessGraph thresholdSuccessGraph = new ThresholdSuccessGraph();
             ROCCurve rocCurve = new ROCCurve();
-            DETCurve detCurve = new DETCurve();
 
             (double[] results, bool[] trueValues) = resultsStore.GetResults(config.GetStr("filePath"));
 
             thresholdSuccessGraph.Display(new IConfiguration[] { config });
             rocCurve.Display(new IConfiguration[] { config });
-            detCurve.Display(new IConfiguration[] { config });
         }
 
         public void Run(IConfiguration[] configs)
         {
             ThresholdSuccessGraph thresholdSuccessGraph = new ThresholdSuccessGraph();
             ROCCurve rocCurve = new ROCCurve();
-            DETCurve detCurve = new DETCurve();
 
             thresholdSuccessGraph.Display(configs);
             rocCurve.Display(configs);
-            detCurve.Display(configs);
         }
     }
 
+    /* View Demo Results Runner
+     * Reads in the demo results from a text file
+     * Visually displays the success rate as a bar graph
+     * Multiple sets of demo results can be viewed at once
+     */
     public class ViewDemoResultsRunner : IRunner
     {
         public void Run(IConfiguration config)

@@ -3,19 +3,30 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace nea
 {
+    /* Interface definition for a Cryptanalysis class
+     * Derived objects cycle through possible keys
+     */
     internal interface ICryptanalysis
     {
+        /* Returns an IEnumerable which cycles through possible keys
+         */
         IEnumerable<byte[]> GetKeys(string text);
     }
 
 
+    /* Cryptanalysis for the ROT13 cipher
+     * Cycles through every possible key from 1 to 26
+     */
     public class ROT13Cryptanalysis : ICryptanalysis
     {
 
@@ -29,6 +40,9 @@ namespace nea
 
     }
 
+    /* Cryptanalysis for the ROT13 cipher
+     * Takes character frequencies into account in order to prioritise likely keys
+     */
     public class FasterROT13Cryptanalysis : ICryptanalysis
     {
         private const string ORDEROFCHECK = "etaoinsrhldcumfpgwybvkxjqz";
@@ -64,6 +78,9 @@ namespace nea
         }
     }
 
+    /* Cryptanalysis for the ROT47 cipher
+     * Takes character frequencies into account in order to prioritise likely keys
+     */
     public class ROT47Cryptanalysis : ICryptanalysis
     {
 
@@ -105,12 +122,19 @@ namespace nea
 
     }
 
+    /* Cryptanalysis for the Vigenere cipher
+     * Calculates Index of Coincidence in order to determine the likely key lengths
+     * Splits the text up into slices - sections which have been encrypted using the same key
+     * Uses frequency analysis in order to prioritise the most likely keys for each slice
+     */
     public class VigenereCryptanalysis : ICryptanalysis
     {
-        private const double IOTTHRESHOLD = 1.5;
-        private const int MAXKEYLENGTH = 6; //JUSTIFYYYY
+        private const double IOCTHRESHOLD = 1.5;
+        private const int MAXKEYLENGTH = 6;
         private const string ALPHABET = "abcdefghijklmnopqrstuvwxyz";
 
+        /* Splits text into slices
+         */
         private string[] GetSlices(string text, int numSlices)
         {
             string[] slices = new string[numSlices];
@@ -128,6 +152,8 @@ namespace nea
             return slices;
         }
 
+        /* Returns the character frequencies
+         */
         private Dictionary<char, int> GetCharCounts(string text)
         {
             Dictionary<char, int> textCounts = new Dictionary<char, int>();
@@ -143,19 +169,24 @@ namespace nea
             return textCounts;
         }
 
+        /* Calculation of Index of Coincidence
+         * Returns the probability that any two randomly selected characters in the text are the same
+         */
         private double CalcIdxOfCoincidence(string textSlice)
+        {
+            double idxOfCoincidence = 0;
+            Dictionary<char, int> charCounts = GetCharCounts(textSlice);
+
+            foreach (KeyValuePair<char, int> kvp in charCounts)
             {
-                double idxOfCoincidence = 0;
-                Dictionary<char, int> charCounts = GetCharCounts(textSlice);
-
-                foreach (KeyValuePair<char, int> kvp in charCounts)
-                {
-                    idxOfCoincidence += (double) kvp.Value * (kvp.Value - 1) / ( textSlice.Length * (textSlice.Length - 1) );
-                }
-
-                return idxOfCoincidence * 26;
+                idxOfCoincidence += (double) kvp.Value * (kvp.Value - 1) / ( textSlice.Length * (textSlice.Length - 1) );
             }
 
+            return idxOfCoincidence * 26;
+        }
+
+        /* Cycles through possible key lengths and their associated slices
+         */
         private IEnumerable<(int, string[])> GetLikelyKeyLength(string text)
         {
             for (int i = 1; i < MAXKEYLENGTH; i++)
@@ -169,7 +200,7 @@ namespace nea
                     totalIoC += CalcIdxOfCoincidence(slice);
                 }
 
-                if (totalIoC / i > IOTTHRESHOLD)
+                if (totalIoC / i > IOCTHRESHOLD)
                 {
                     yield return (i, slices);
                 }
@@ -177,6 +208,8 @@ namespace nea
 
         }
 
+        /* Cycles through likely keys for a single slice
+         */
         private IEnumerable<int> GetSingleKey(string slice, int attempts = 26)
         {
             ROT13 cipher = new ROT13();
@@ -187,7 +220,6 @@ namespace nea
 
             for(int i = 0; i < 26; i++)
             {
-                Console.WriteLine((char) ((int)'A' + i));
                 double pvalue = freqAnalysis.Classify(cipher.Decrypt(slice, BitConverter.GetBytes(i)));
                 keys.Add(i);
                 pvalues.Add(pvalue);
@@ -202,9 +234,11 @@ namespace nea
             }
         }
 
+        /* Recursive function which cycles through possible keys for a given key length
+         * Increments keys in order of plausibility according to frequency analysis from rightmost to leftmost
+         */
         private IEnumerable<string> Cycle(int keyLength, int idxInKey, string key, string[] slices)
         {
-            Console.WriteLine(idxInKey);
 
             foreach (int intKeyChar in GetSingleKey(slices[idxInKey], 10))
             {
@@ -225,13 +259,15 @@ namespace nea
 
         }
 
+        /* Cycles through keys and key lengths
+         * Converts the output from Cycle into an appropriate format
+         */
         public IEnumerable<byte[]> GetKeys(string text)
         {
             foreach ((int keyLength, string[] slices) in GetLikelyKeyLength(text))
             {
                 foreach (string possibleKey in Cycle(keyLength, 0, "", slices))
                 {
-                    Console.WriteLine(possibleKey);
                     yield return Encoding.UTF8.GetBytes(possibleKey);
                 }
             }
@@ -239,12 +275,32 @@ namespace nea
         }
     }
 
+    /* Cryptanalysis for the Substitution cipher
+     * Uses a dictionary to calculate the approximate Hamming edit distance of the text
+     * Initial key is based on frequency analysis
+     * Key characters are swapped at random and compared with the previous guess
+     */
     public class SubstitutionCryptanalysis : ICryptanalysis
     {
 
         private const string ORDEROFFREQUENCY = "etaoinsrhldcumfpgwybvkxjqz";
         private const string ALPHABET = "abcdefghijklmnopqrstuvwxyz";
+        private const int NUMBEROFSWAPS = 1000;
+        private string dictionaryFilePath;
+        private Random random;
+        private ICipher cipher;
+        private IClassifier classifier;
 
+        public SubstitutionCryptanalysis(string dictionaryFilePath)
+        {
+            this.dictionaryFilePath = dictionaryFilePath;
+            random = new Random();
+            cipher = new Substitution();
+            classifier = new ClosenessToDictionary(dictionaryFilePath);
+        }
+
+        /* Finds character frequencies used for frequency analysis
+         */
         public string GetCharFreqs(string text)
         {
             string orderOfFreqsInText = "";
@@ -266,6 +322,24 @@ namespace nea
 
             return orderOfFreqsInText;
         }
+
+        /* Makes the initial key guess based off of frequency analysis
+         */
+        private string FirstGuess(string text)
+        {
+            string freqsInText = GetCharFreqs(text);
+            string key = "";
+
+            foreach (char letter in ALPHABET)
+            {
+                key += freqsInText[ORDEROFFREQUENCY.IndexOf(letter)];
+            }
+
+            return key;
+        }
+
+        /* Swaps key characters randomly
+         */
         private string RandomSwap(string key, Random random)
         {
             int idx1 = random.Next(0, key.Length);
@@ -282,28 +356,25 @@ namespace nea
             return newKey;
         }
 
+        /* Cycles through keys
+         * After random swap, ClosenessToDictionary classifier is used to determine
+         * whether the new key is an improvement or not
+         * The better key is kept
+         * Over iterations, the key will improve
+         */
         public IEnumerable<byte[]> GetKeys(string text)
         {
-            string freqsInText = GetCharFreqs(text);
-            string key = "";
+            string key = FirstGuess(text);
 
-            foreach (char letter in ALPHABET)
-            {
-                key += freqsInText[ORDEROFFREQUENCY.IndexOf(letter)];
-            }
-
-            IClassifier classifier = new ClosenessToDictionary();
-            ICipher cipher = new Substitution();
-            Random random = new Random();
-            int numSwaps = 1000;
             string decryptedText = cipher.Decrypt(text, Encoding.UTF8.GetBytes(key));
             double classification = classifier.Classify(decryptedText);
 
-            for (int i = 0; i < numSwaps; i++)
+            for (int i = 0; i < NUMBEROFSWAPS; i++)
             {
                 string newKey = RandomSwap(key, random);
                 string decrypted = cipher.Decrypt(text, Encoding.UTF8.GetBytes(newKey));
                 double newClassification = classifier.Classify(decrypted);
+
                 if (newClassification > classification)
                 {
                     key = newKey;
@@ -312,50 +383,24 @@ namespace nea
 
             }
 
-            Console.WriteLine(key);
-            Console.WriteLine(classification);
-            Console.WriteLine(cipher.Decrypt(text, Encoding.UTF8.GetBytes(key)));
             yield return Encoding.UTF8.GetBytes(key);
 
         }
 
-        private List<char> FindOneLetterWords(string text)
-        {
-            List<char> oneLetterWords = new List<char>();
-            foreach (Match match in Regex.Matches(text, "[a-zA-Z]+"))
-            {
-                string word = match.Value;
-                if (word.Length == 1)
-                {
-                    oneLetterWords.Add(word[0]);
-                }
-            }
-            return oneLetterWords;
-        }
-
-        private List<char[]> PairsOfOneLetterWords(List<char> oneLetterWords)
-        {
-            List<char[]> pairs = new List<char[]>();
-            for (int i = 0; i < oneLetterWords.Count(); i++)
-            {
-                for (int j = 0; j < oneLetterWords.Count(); j++)
-                {
-                    if (i != j)
-                    {
-                        pairs.Add(new char[] { oneLetterWords[i], oneLetterWords[j] });
-                    }
-                }
-            }
-            return pairs;
-        }
-
     }
 
+    /* Cryptanalysis for the XOR cipher
+     * Calculates Index of Coincidence in order to determine the likely key lengths
+     * Splits the text up into slices - sections which have been encrypted using the same key
+     * Uses frequency analysis in order to prioritise the most likely keys for each slice
+     */
     public class XORCryptanalysis : ICryptanalysis
     {
-        private const double IOTTHRESHOLD = 0.06; //This is ~ 1.5 / 26 but will need to justify this in writeup
+        private const double IOCTHRESHOLD = 0.06; //This is ~ 1.5 / 26 but will need to justify this in writeup
         private const int MAXKEYLENGTH = 6; //also try to maybe justify
 
+        /* Splits the text up into slices
+         */
         private string[] GetSlices(string text, int numSlices)
         {
             string[] slices = new string[numSlices];
@@ -368,6 +413,8 @@ namespace nea
             return slices;
         }
 
+        /* Returns character frequencies for use in frequency analysis
+         */
         private Dictionary<char, int> GetCharCounts(string text)
         {
             Dictionary<char, int> textCounts = new Dictionary<char, int>();
@@ -383,6 +430,9 @@ namespace nea
             return textCounts;
         }
 
+        /* Calculation of Index of Coincidence
+         * Returns the probability that any two randomly selected characters in the text are the same
+         */
         private double CalcIdxOfCoincidence(string textSlice)
         {
             double idxOfCoincidence = 0;
@@ -395,6 +445,9 @@ namespace nea
 
             return idxOfCoincidence;
         }
+
+        /* Uses Index of Coincidence to estimate the key length
+         */
         private IEnumerable<(int, string[])> GetLikelyKeyLength(string text)
         {
             List<int> keyLengths = new List<int>();
@@ -414,7 +467,7 @@ namespace nea
                 keyLengths.Add(i);
                 IoCValues.Add(totalIoC / i);
 
-                if (totalIoC / i > IOTTHRESHOLD)
+                if (totalIoC / i > IOCTHRESHOLD)
                 {
                     yield return (i, slices);
                 }
@@ -430,6 +483,8 @@ namespace nea
             }
         }
 
+        /* Recursive function which cycles through likely keys for a single key character
+         */
         private IEnumerable<char> GetSingleKey(string slice, int attempts = 26)
         {
             XOR cipher = new XOR();
@@ -454,14 +509,12 @@ namespace nea
             }
         }
 
+        /* Cycles through possible keys for a particular key length
+         */
         private IEnumerable<string> Cycle(int keyLength, int idxInKey, string key, string[] slices)
         {
-            Console.WriteLine(idxInKey);
-
             foreach (char keyChar in GetSingleKey(slices[idxInKey], 10))
             {
-                //char keyChar = (char)((intKeyChar % 26 + 26) % 26 + 'A');
-
                 if (idxInKey == keyLength - 1)
                 {
                     yield return key + keyChar;
@@ -477,13 +530,15 @@ namespace nea
 
         }
 
+        /* Cycles through possible keys and key lengths
+         * Converts keys into the appropriate format
+         */
         public IEnumerable<byte[]> GetKeys(string text)
         {
             foreach ((int keyLength, string[] slices) in GetLikelyKeyLength(text))
             {
                 foreach (string possibleKey in Cycle(keyLength, 0, "", slices))
                 {
-                    Console.WriteLine(possibleKey);
                     yield return Encoding.UTF8.GetBytes(possibleKey);
                 }
             }
@@ -491,6 +546,8 @@ namespace nea
         }
     }
 
+    /* Returns the cryptanalysis object associated with the cryptanalysis type passed in
+     */
     class CryptanalysisFactory
     {
         public static ICryptanalysis GetCryptanalysis(string cryptanalysisType)
@@ -508,7 +565,9 @@ namespace nea
                 case "VigenereCryptanalysis":
                     return new VigenereCryptanalysis();
                 case "SubstitutionCryptanalysis":
-                    return new SubstitutionCryptanalysis();
+                    return new SubstitutionCryptanalysis("C:\\Users\\betha\\Code\\nea\\FilesForUse\\EnglishDictionary.txt");
+                case "FasterSubstitutionCryptanalysis":
+                    return new SubstitutionCryptanalysis("C:\\Users\\betha\\Code\\nea\\FilesForUse\\CommonEnglishWords.txt");
                 default:
                     throw new Exception("No valid cryptanalysis selected");
             }

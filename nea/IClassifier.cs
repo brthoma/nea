@@ -62,12 +62,22 @@ namespace nea
      */
     public class DictionaryLookup : IClassifier
     {
-        private const string DICTIONARYFILEPATH = "FilesForUse\\EnglishDictionary.txt";
+        private const string DICTIONARYFILEPATH = "C:\\Users\\betha\\Code\\nea\\FilesForUse\\EnglishDictionary.txt";
         private string[] dictionary;
 
         public DictionaryLookup()
         {
-            dictionary = File.ReadAllLines(DICTIONARYFILEPATH);
+            GetDictionary(DICTIONARYFILEPATH);
+        }
+
+        public DictionaryLookup(string dictionaryFilePath)
+        {
+            GetDictionary(dictionaryFilePath);
+        }
+
+        private void GetDictionary(string filePath)
+        {
+            dictionary = File.ReadAllLines(filePath);
 
             for (int i = 0; i < dictionary.Length; i++)
             {
@@ -107,6 +117,7 @@ namespace nea
         {
             int inDictionary = 0;
             int numWords = 0;
+            List<string>words = new List<string>();
 
 
             foreach (Match match in Regex.Matches(text, "[a-zA-Z]+"))
@@ -116,6 +127,7 @@ namespace nea
                 if (BinarySearch(word))
                 {
                     inDictionary++;
+                    words.Add(word);
                 }
             }
 
@@ -134,26 +146,19 @@ namespace nea
      */
     public class FrequencyAnalysis : IClassifier
     {
-        private const string GAMMAFUNCTLOOKUP = "FilesForUse\\LookupGammaFunct.txt";
-        private const string EXPECTEDFREQUENCIES = "FilesForUse\\EnglishLetterDistribution.txt";
+        private const string GAMMAFUNCTLOOKUP = "C:\\Users\\betha\\Code\\nea\\FilesForUse\\LookupGammaFunct.txt";
+        private const string EXPECTEDFREQUENCIES = "C:\\Users\\betha\\Code\\nea\\FilesForUse\\EnglishLetterDistribution.txt";
         private const int OPTIMALN = 100;
         private const int LETTERSINALPHABET = 26;
         private const int NUMINTERVALS = 1000;
         private const string ALPHABET = "abcdefghijklmnopqrstuvwxyz";
         private Dictionary<double, double> LookupGammaFunct = new Dictionary<double, double>();
         private double[] expectedEngDistribution = new double[LETTERSINALPHABET];
+        private double[] expectedFreqs;
 
         public FrequencyAnalysis()
         {
-            using(StreamReader sr = new StreamReader(GAMMAFUNCTLOOKUP))
-            {
-                while (!sr.EndOfStream)
-                {
-                    string[] kvp = sr.ReadLine().Trim().Split('|');
-                    LookupGammaFunct.Add(double.Parse(kvp[0]), double.Parse(kvp[1]));
-                }
-                sr.Close();
-            }
+            LookupGammaFunct = Statistics.GetGammaFunctionValues(GAMMAFUNCTLOOKUP);
 
             using (StreamReader sr = new StreamReader(EXPECTEDFREQUENCIES))
             {
@@ -163,23 +168,31 @@ namespace nea
                 }
                 sr.Close();
             }
-        }
 
-        public double Classify(string text)
-        {
-            int numLetters = text.Count(c => ALPHABET.Contains(char.ToLower(c)));
-
-            double[] expectedFreqs = new double[LETTERSINALPHABET];
+            expectedFreqs = new double[LETTERSINALPHABET];
             for (int i = 0; i < LETTERSINALPHABET; i++)
             {
                 expectedFreqs[i] = expectedEngDistribution[i] * OPTIMALN;
             }
+        }
+
+        public double[] GetObservedFreqs(string text)
+        {
+            int numLetters = text.Count(c => ALPHABET.Contains(char.ToLower(c)));
 
             double[] observedFreqs = new double[LETTERSINALPHABET];
             for (int i = 0; i < LETTERSINALPHABET; i++)
             {
                 observedFreqs[i] = (double) text.Count(c => char.ToLower(c) == (char)('a' + i)) * ((double) OPTIMALN / numLetters);
             }
+
+            return observedFreqs;
+        }
+
+
+        public double Classify(string text)
+        {
+            double[] observedFreqs = GetObservedFreqs(text);
 
             (double[] combinedObsFreqs, double[] combinedExpFreqs) = Statistics.CombineChiSquaredClasses(observedFreqs, expectedFreqs, OPTIMALN);
 
@@ -203,8 +216,8 @@ namespace nea
      */
     public class WordLength : IClassifier
     {
-        private const string GAMMAFUNCTLOOKUP = "FilesForUse\\LookupGammaFunct.txt";
-        private const string EXPECTEDLENGTHS = "FilesForUse\\ExpectedWordLengths.txt";
+        private const string GAMMAFUNCTLOOKUP = "C:\\Users\\betha\\Code\\nea\\FilesForUse\\LookupGammaFunct.txt";
+        private const string EXPECTEDLENGTHS = "C:\\Users\\betha\\Code\\nea\\FilesForUse\\ExpectedWordLengths.txt";
         private const int MAXENGWORDLENGTH = 20;
         private const int OPTIMALN = 100;
         private const int NUMINTERVALS = 1000;
@@ -234,7 +247,7 @@ namespace nea
                 sr.Close();
             }
 
-            expectedFreqs = Statistics.ScaleFrequencies(expectedEngDistribution, OPTIMALN);
+            expectedFreqs = Statistics.ScaleFrequencies(expectedEngDistribution, (double) OPTIMALN);
         }
 
         private double[] GetObservedFreqs(string text)
@@ -270,7 +283,7 @@ namespace nea
                 observedFreqs[currentWordLength - 1]++;
             }
 
-            observedFreqs = Statistics.ScaleFrequencies(observedFreqs, OPTIMALN);
+            observedFreqs = Statistics.ScaleFrequencies(observedFreqs, (double) OPTIMALN);
 
             return observedFreqs;
         }
@@ -300,8 +313,8 @@ namespace nea
      */
     public class Bigrams : IClassifier
     {
-        private const string GAMMAFUNCTLOOKUP = "FilesForUse\\LookupGammaFunct.txt";
-        private const string COMMONBIGRAMS = "FilesForUse\\CommonBigrams.txt";
+        private const string GAMMAFUNCTLOOKUP = "C:\\Users\\betha\\Code\\nea\\FilesForUse\\LookupGammaFunct.txt";
+        private const string COMMONBIGRAMS = "C:\\Users\\betha\\Code\\nea\\FilesForUse\\CommonBigrams.txt";
         private const int NUMBIGRAMSINFILE = 676;
         private const int OPTIMALN = 100;
         private const int NUMINTERVALS = 1000;
@@ -398,21 +411,25 @@ namespace nea
 
         public double Classify(string text)
         {
-            int[] occurrences = new int[MAXRANGE - MINRANGE + 1];
+            Dictionary<char, int> occurrences = new Dictionary<char, int>();
             double entropy = 0;
             double probability;
 
             foreach (char c in text)
             {
-                if (MINRANGE <= c && c <= MAXRANGE)
+                if (occurrences.ContainsKey(c))
                 {
-                    occurrences[c - MINRANGE]++;
+                    occurrences[c]++;
+                }
+                else
+                {
+                    occurrences.Add(c, 1);
                 }
             }
 
-            for (int i = 0; i < occurrences.Length; i++)
+            foreach (KeyValuePair<char, int> kvp in occurrences)
             {
-                double p = (double) occurrences[i] / text.Length;
+                double p = (double) kvp.Value / text.Length;
                 if (p != 0)
                 {
                     entropy += p * Math.Log(p, 2);
@@ -467,13 +484,12 @@ namespace nea
      */
     public class ClosenessToDictionary : IClassifier
     {
-        private const string DICTIONARYFILEPATH = "FilesForUse\\EnglishDictionary.txt";
         private string[] dictionary;
         private Dictionary<int, List<string>> dictionaries;
 
-        public ClosenessToDictionary()
+        public ClosenessToDictionary(string dictionaryFilePath)
         {
-            dictionary = File.ReadAllLines(DICTIONARYFILEPATH);
+            dictionary = File.ReadAllLines(dictionaryFilePath);
             dictionaries = new Dictionary<int, List<string>>();
 
             for (int i = 0; i < dictionary.Length; i++)

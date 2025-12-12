@@ -9,12 +9,17 @@ using System.Dynamic;
 namespace nea
 {
 
+    /* Interface definition for a DataGenerator class
+     * Derived classes generate text
+     */
     public interface IDataGenerator
     {
         string GenerateData(Random random, int length);
     }
 
 
+    /* Returns random words from a dictionary until the character count is reached
+     */
     public class WordsFromDict : IDataGenerator
     {
         private string dictionaryFilePath;
@@ -40,6 +45,8 @@ namespace nea
 
     }
 
+    /* Returns a section of text from the data corpus of the specified length
+     */
     public class TextFromCorpus : IDataGenerator
     {
         private string corpusFilePath;
@@ -71,10 +78,12 @@ namespace nea
     }
 
 
+    /* Returns the data generator object associated with the data generator type passed in
+     */
     class DataGeneratorFactory
     {
-        private const string DICTIONARYFILEPATH = "FilesForUse\\EnglishDictionary.txt";
-        private const string CORPUSFILEPATH = "FilesForUse\\DataCorpus.txt";
+        private const string DICTIONARYFILEPATH = "C:\\Users\\betha\\Code\\nea\\FilesForUse\\EnglishDictionary.txt";
+        private const string CORPUSFILEPATH = "C:\\Users\\betha\\Code\\nea\\FilesForUse\\DataCorpus.txt";
 
         public static IDataGenerator GetDataGenerator(string dataGeneratorType)
         {

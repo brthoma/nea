@@ -49,8 +49,10 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ROT13EncryptionTest.cs" />
+    <Compile Include="CipherTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StatisticsTests.cs" />
+    <Compile Include="ClassifierTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

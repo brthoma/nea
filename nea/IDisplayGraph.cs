@@ -9,12 +9,21 @@ using XPlot.Plotly;
 
 namespace nea
 {
+    /* Interface definition for a DisplayGraph object
+     * Derived objects display graphs to show the results of the tests/demonstrations passed in
+     * Graphing uses the XPlot.Plotly graphing library
+     */
     public interface IDisplayGraph
     {
         void Display(IConfiguration[] configs);
     }
 
 
+    /* Threshold-Success Graph
+     * Used to display test results
+     * Calculates the proportion of the tests which would be successful for each threshold value
+     * Displays this as a scatter plot
+     */
     public class ThresholdSuccessGraph : IDisplayGraph
     {
 
@@ -73,6 +82,10 @@ namespace nea
 
     }
 
+    /* ROC curve
+     * Calculates the false positive and true positive rates for each threshold value
+     * Displays this information as a Scatter plot
+     */
     public class ROCCurve : IDisplayGraph
     {
 
@@ -149,80 +162,9 @@ namespace nea
 
     }
 
-    public class DETCurve : IDisplayGraph
-    {
-
-        private const int NUMDATAPOINTS = 1000;
-
-        private (double, double) GetValuesAtThreshold(double[] results, bool[] trueValues, double threshold)
-        {
-            int numFalsePositives = 0;
-            int numFalseNegatives = 0;
-            int numPositives = 0;
-            int numNegatives = 0;
-
-            for (int i = 0; i < results.Length; i++)
-            {
-                if (trueValues[i])
-                {
-                    numPositives++;
-                    if (results[i] < threshold)
-                    {
-                        numFalseNegatives++;
-                    }
-                }
-                if (!trueValues[i])
-                {
-                    numNegatives++;
-                    if (results[i] >= threshold)
-                    {
-                        numFalsePositives++;
-                    }
-                }
-            }
-
-            return ((double) numFalsePositives / numNegatives, (double) numFalseNegatives / numPositives);
-        }
-
-        public void Display(IConfiguration[] configs)
-        {
-            TestResultsStore resultsStore = new TestResultsStore();
-
-            Scatter[] scatterPlots = new Scatter[configs.Length];
-
-            for (int i = 0; i < configs.Length; i++)
-            {
-                (double[] results, bool[] trueValues) = resultsStore.GetResults(configs[i].GetStr("filePath"));
-
-                double[] falsePositiveRate = new double[NUMDATAPOINTS + 1];
-                double[] falseNegativeRate = new double[NUMDATAPOINTS + 1];
-
-                for (int j = 0; j < falsePositiveRate.Length; j++)
-                {
-                    double threshold = (double)j / NUMDATAPOINTS;
-                    (falsePositiveRate[j], falseNegativeRate[j]) = GetValuesAtThreshold(results, trueValues, threshold);
-                    Console.WriteLine($"{threshold} {falsePositiveRate[j]} {falseNegativeRate[j]}");
-                }
-
-                Scatter scatter = new Scatter()
-                {
-                    x = falsePositiveRate,
-                    y = falseNegativeRate,
-                    mode = "match",
-                    name = configs[i].GetStr("filePath")
-                };
-
-                scatterPlots[i] = scatter;
-            }
-
-            PlotlyChart combinedScatterPlot = Chart.Plot(scatterPlots);
-            combinedScatterPlot.WithXTitle("False Positive Rate");
-            combinedScatterPlot.WithYTitle("False Negative Rate");
-            combinedScatterPlot.Show();
-        }
-
-    }
-
+    /* Success rate graph
+     * Displays a bar chart showing the success rate of each demonstration
+     */
     public class ShowSuccessRate : IDisplayGraph
     {
         public void Display(IConfiguration[] configs)
@@ -237,7 +179,6 @@ namespace nea
                 xAxis[i] = configs[i].GetStr("filePath");
                 yAxis[i] = (double)success.Count(b => b) / success.Length;
 
-                //Console.WriteLine($"File name: {configs[i].GetStr("filePath")} | Success rate: {(double)success.Count(b => b) / success.Length}");
             }
             var barchart = Chart.Plot(new Bar()
             {
