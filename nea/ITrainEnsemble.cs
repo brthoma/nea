@@ -37,6 +37,17 @@ namespace nea
 
             return weights;
         }
+        public double[] GetWeights(int numClassifiers)
+        {
+            double[] weights = new double[numClassifiers];
+
+            for (int i = 0; i  < numClassifiers; i++)
+            {
+                weights[i] = (double) 1 / numClassifiers;
+            }
+
+            return weights;
+        }
     }
 
     public class ProportionalVoting : ITrainEnsemble

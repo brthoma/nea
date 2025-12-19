@@ -583,9 +583,14 @@ namespace nea
                 case "Entropy":
                     return new Entropy();
                 case "MajorityVoteEnsemble":
-                    IClassifier[] classifiers = new IClassifier[] { new RandomGuesser(), new ProportionPrintable(), new DictionaryLookup(), new FrequencyAnalysis(), new Entropy() };
-                    MajVoting trainer = new MajVoting();
-                    return new Ensemble(classifiers, trainer.GetWeights(classifiers, cipher));
+                    IClassifier[] mClassifiers = new IClassifier[] { new RandomGuesser(), new ProportionPrintable(), new DictionaryLookup(), new FrequencyAnalysis(), new Bigrams(), new WordLength(), new Entropy() };
+                    MajVoting mTrainer = new MajVoting();
+                    return new Ensemble(mClassifiers, mTrainer.GetWeights(mClassifiers, cipher));
+                //case "ProportionalVoteEnsemble":
+                //    IClassifier[] pClassifiers = new IClassifier[] { new RandomGuesser(), new ProportionPrintable(), new DictionaryLookup(), new FrequencyAnalysis(), new Bigrams(), new WordLength(), new Entropy() };
+                //    string[] classifierNames = new string[] { "RandomGuesser", "ProportionPrintable", "DictionaryLookup", "FrequencyAnalysis", "Bigrams", "WordLength", "Entropy" };
+                //    ProportionalVoting pTrainer = new ProportionalVoting(classifierNames);
+                //    return new Ensemble(pClassifiers, pTrainer.GetWeights(pClassifiers, cipher));
                 default:
                     throw new Exception("No valid classifier selected");
             }

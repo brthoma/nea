@@ -381,26 +381,42 @@ namespace neaTest
     [TestClass]
     public class EnsembleTest
     {
-        ClassifierTestInputs inputs = new ClassifierTestInputs();
+        private ClassifierTestInputs inputs = new ClassifierTestInputs();
+        private IClassifier[][] ensembles = new IClassifier[][]
+        {
+            new IClassifier[] { new TrueClassifier() },
+            new IClassifier[] { new FalseClassifier() },
+            new IClassifier[] { new TrueClassifier(), new TrueClassifier() },
+            new IClassifier[] { new FalseClassifier(), new TrueClassifier() },
+            new IClassifier[] { new TrueClassifier(), new FalseClassifier(), new FalseClassifier() },
+        };
 
         [TestMethod]
-        private void TestProcess()
+        [DataRow(0, 1)]
+        [DataRow(1, 0)]
+        [DataRow(2, 1)]
+        [DataRow(3, 0.5)]
+        [DataRow(4, (double) 1 / 3)]
+        private void TestProcess(int ensembleIdx, double expectedOutput)
         {
+            MajVoting trainer = new MajVoting();
+            Ensemble classifier = new Ensemble(ensembles[ensembleIdx], trainer.GetWeights(ensembles[ensembleIdx].Length));
+            double classification = classifier.Classify("");
 
+            Assert.AreEqual(expectedOutput, classification);
         }
 
         [TestMethod]
-        [DataRow(0, new IClassifier[] { new TrueClassifier() })]
+        [DataRow(0)]
         [DataRow(1)]
         [DataRow(2)]
         [DataRow(3)]
         [DataRow(4)]
-        [DataRow(5)]
-        [DataRow(6)]
-        public void TestRange(int textIdx, IClassifier[] classifiers)
+        public void TestRange(int ensembleIdx)
         {
-            Ensemble classifier = new Ensemble(classifiers);
-            double classification = classifier.Classify(inputs.inputs[textIdx]);
+            MajVoting trainer = new MajVoting();
+            Ensemble classifier = new Ensemble(ensembles[ensembleIdx], trainer.GetWeights(ensembles[ensembleIdx].Length));
+            double classification = classifier.Classify("");
 
             Assert.IsTrue(classification >= 0 && classification <= 1);
         }
