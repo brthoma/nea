@@ -250,7 +250,7 @@ namespace nea
             expectedFreqs = Statistics.ScaleFrequencies(expectedEngDistribution, (double) OPTIMALN);
         }
 
-        private double[] GetObservedFreqs(string text)
+        public double[] GetObservedFreqs(string text)
         {
             double[] observedFreqs = new double[MAXENGWORDLENGTH + 1];
             int currentWordLength = 0;
@@ -344,6 +344,11 @@ namespace nea
                 }
                 sr.Close();
             }
+        }
+
+        public Dictionary<string, (double, int)> GetBigramFreqs()
+        {
+            return bigramsExpAndObs;
         }
 
         public double Classify(string text)
