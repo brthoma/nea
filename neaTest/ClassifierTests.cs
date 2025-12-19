@@ -341,32 +341,69 @@ namespace neaTest
         }
     }
 
-    //[TestClass]
-    //public class EnsembleTest
-    //{
-    //    TextInputs inputs = new TextInputs();
+    [TestClass]
+    public class HammingEditDistTest
+    {
+        [TestMethod]
+        [DataRow("kerstin", 0)]
+        [DataRow("karolin", (double) 3 / 7)]
+        [DataRow("kathrin", (double) 4 / 7)]
+        [DataRow("aaaa", (double) 4 / 4)]
+        [DataRow("abdf", (double) 3 / 4)]
+        [DataRow("planet", (double) 1 / 6)]
+        [DataRow("planar", (double) 2 / 6)]
+        public void TestProcess(string text, double expectedOutput, string dictionaryFilePath = "C:\\Users\\betha\\Code\\nea\\neaTest\\bin\\Debug\\FilesForTesting\\HammingDictionary.txt")
+        {
+            HammingEditDist classifier = new HammingEditDist(dictionaryFilePath);
+            double classification = classifier.Classify(text);
 
-    //    [TestMethod]
-    //    private void TestProcess()
-    //    {
+            Assert.AreEqual(1 - expectedOutput, classification, 5e-10);
+        }
 
-    //    }
+        [TestMethod]
+        [DataRow("kerstin")]
+        [DataRow("karolin")]
+        [DataRow("kathrin")]
+        [DataRow("aaaa")]
+        [DataRow("abdf")]
+        [DataRow("planet")]
+        [DataRow("planar")]
+        public void TestRange(string text, string dictionaryFilePath = "C:\\Users\\betha\\Code\\nea\\neaTest\\bin\\Debug\\FilesForTesting\\HammingDictionary.txt")
+        {
+            HammingEditDist classifier = new HammingEditDist(dictionaryFilePath);
+            double classification = classifier.Classify(text);
 
-    //    [TestMethod]
-    //    [DataRow(0)]
-    //    [DataRow(1)]
-    //    [DataRow(2)]
-    //    [DataRow(3)]
-    //    [DataRow(4)]
-    //    [DataRow(5)]
-    //    [DataRow(6)]
-    //    public void TestRange(int textIdx)
-    //    {
-    //        Ensemble classifier = new Ensemble();
-    //        double classification = classifier.Classify(inputs.inputs[textIdx]);
+            Assert.IsTrue(classification >= 0 && classification <= 1);
+        }
 
-    //        Assert.IsTrue(classification >= 0 && classification <= 1);
-    //    }
-    //}
+    }
+
+    [TestClass]
+    public class EnsembleTest
+    {
+        ClassifierTestInputs inputs = new ClassifierTestInputs();
+
+        [TestMethod]
+        private void TestProcess()
+        {
+
+        }
+
+        [TestMethod]
+        [DataRow(0, new IClassifier[] { new TrueClassifier() })]
+        [DataRow(1)]
+        [DataRow(2)]
+        [DataRow(3)]
+        [DataRow(4)]
+        [DataRow(5)]
+        [DataRow(6)]
+        public void TestRange(int textIdx, IClassifier[] classifiers)
+        {
+            Ensemble classifier = new Ensemble(classifiers);
+            double classification = classifier.Classify(inputs.inputs[textIdx]);
+
+            Assert.IsTrue(classification >= 0 && classification <= 1);
+        }
+    }
 
 }

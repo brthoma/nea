@@ -487,12 +487,12 @@ namespace nea
     /* Returns a value in the range 0-1 which indicates the average number of characters
      * each word is from the closest dictionary word (in terms of Edit distance)
      */
-    public class ClosenessToDictionary : IClassifier
+    public class HammingEditDist : IClassifier
     {
         private string[] dictionary;
         private Dictionary<int, List<string>> dictionaries;
 
-        public ClosenessToDictionary(string dictionaryFilePath)
+        public HammingEditDist(string dictionaryFilePath)
         {
             dictionary = File.ReadAllLines(dictionaryFilePath);
             dictionaries = new Dictionary<int, List<string>>();

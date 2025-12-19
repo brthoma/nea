@@ -296,7 +296,7 @@ namespace nea
             this.dictionaryFilePath = dictionaryFilePath;
             random = new Random();
             cipher = new Substitution();
-            classifier = new ClosenessToDictionary(dictionaryFilePath);
+            classifier = new HammingEditDist(dictionaryFilePath);
         }
 
         /* Finds character frequencies used for frequency analysis
