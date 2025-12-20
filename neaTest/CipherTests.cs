@@ -66,6 +66,7 @@ namespace neaTest
         [DataRow(1)]
         [DataRow(25)]
         [DataRow(31)]
+        [DataRow(13)]
         public void TestVaryingKeys(int intKey, string plaintext = "The quick, brown fox jumps over the lazy dog!")
         {
             ROT13 cipher = new ROT13();
@@ -148,11 +149,11 @@ namespace neaTest
 
         [TestMethod]
         [DataRow(0)]
-        [DataRow(26)]
+        [DataRow(94)]
         [DataRow(1)]
-        [DataRow(25)]
-        [DataRow(31)]
         [DataRow(93)]
+        [DataRow(102)]
+        [DataRow(47)]
         public void TestVaryingKeys(int intKey, string plaintext = "The quick, brown fox jumps over the lazy dog!")
         {
             ROT47 cipher = new ROT47();
@@ -204,7 +205,7 @@ namespace neaTest
         [DataRow("AB", "\x15*$b07(!*na 3-6,a$.:a(4/11a-7\'3b5*$b-#;;a&.%`")]
         [DataRow("Z", "\x0e" + "2?z+/391vz8(5-4z<5\"z0/7*)z5,?(z.2?z6; #z>5={")]
         [DataRow("XNZ", "\f&?x?/1-1tn8*!-6n<76z2;7(=z78?*n.0+z4/ !n>7){")]
-        [DataRow("HELLO", "\x1c-)l>=,/\'ch\'>#8&e*#7h/9!?;e#:*:e8$*h)-66h!#+n")]
+        [DataRow("CIPHER", "\x17!5h4\'**;de01&\'&e4,1p\"0?3:p\'371i$  r/(*1e6,.q")]
         public void TestVaryingKeys(string strKey, string expected, string plaintext = "The quick, brown fox jumps over the lazy dog!")
         {
             XOR cipher = new XOR();
@@ -237,7 +238,7 @@ namespace neaTest
         [DataRow("A")]
         [DataRow("AB")]
         [DataRow("Z")]
-        [DataRow("XAM")]
+        [DataRow("XNZ")]
         [DataRow("CIPHER")]
         public void TestVaryingKeys(string strKey, string plaintext = "The quick, brown fox jumps over the lazy dog!")
         {
@@ -253,6 +254,7 @@ namespace neaTest
     [TestClass]
     public class XORGetKeyTest
     {
+        private int maxKeyLength = 6;
 
         [TestMethod]
         public void TestGetRandomKey()
@@ -272,7 +274,7 @@ namespace neaTest
                 }
             }
 
-            Assert.IsTrue(strKey.Length >= 1 && strKey.Length <= 6 && validChars);
+            Assert.IsTrue(strKey.Length >= 1 && strKey.Length <= maxKeyLength && validChars);
         }
 
     }
@@ -286,7 +288,7 @@ namespace neaTest
         [DataRow("", "")]
         [DataRow("abcdefghijklmnopqrstuvwxyz abc zyx", "acedfhgikjlnmoqprtsuwvxzya cbd byy")]
         [DataRow("ABCDEFGHIJKLMNOPQRSTUVWXYZ ABC ZYX", "ACEDFHGIKJLNMOQPRTSUWVXZYA CBD BYY")]
-        [DataRow("1234567890!£$%^&*() ~,.\t\n\r", "1234567890!\xa3$%^&*() ~,.\t\n\r")]
+        [DataRow("1234567890!£$%^&*() ~,.\t\n\r", "1234567890!£$%^&*() ~,.\t\n\r")]
         public void TestVaryingPlaintext(string plaintext, string expected)
         {
             Vigenere cipher = new Vigenere();
@@ -300,7 +302,8 @@ namespace neaTest
         [DataRow("AB", "Tie rujcl, bsoxn goy jvmqs pvfr uhf lbzz dpg!")]
         [DataRow("Z", "Sgd pthbj, aqnvm enw itlor nudq sgd kzyx cnf!")]
         [DataRow("XNZ", "Qud nhhzx, aobvk snu wtjcr lido ggb yzwl clt!")]
-        [DataRow("HELLO", "Alp bipgv, mfvay qce nfxdz sgpf alp wogc ozu!")]
+        [DataRow("CIPHER", "Vpt xyzes, qysnp nde nloxh vzvt bwl prbg svk!"
+)]
         public void TestVaryingKeys(string strKey, string expected, string plaintext = "The quick, brown fox jumps over the lazy dog!")
         {
             Vigenere cipher = new Vigenere();
@@ -317,8 +320,8 @@ namespace neaTest
 
         [TestMethod]
         [DataRow("")]
-        [DataRow("abcdefghijklmnopqrstuvwxyz")]
-        [DataRow("ABCDEFGHIJKLMNOPQRSTUVWXYZ")]
+        [DataRow("abcdefghijklmnopqrstuvwxyz abc zyx")]
+        [DataRow("ABCDEFGHIJKLMNOPQRSTUVWXYZ ABC ZYX")]
         [DataRow("1234567890!£$%^&*() ~,.\t\n\r")]
         public void TestVaryingPlaintext(string plaintext)
         {

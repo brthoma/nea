@@ -253,34 +253,18 @@ namespace nea
         public double[] GetObservedFreqs(string text)
         {
             double[] observedFreqs = new double[MAXENGWORDLENGTH + 1];
-            int currentWordLength = 0;
 
-            for (int i = 0; i < text.Length; i++)
+            foreach (Match match in Regex.Matches(text, "[a-zA-Z]+"))
             {
-                if (!char.IsWhiteSpace(text[i]))
+                string word = match.Value;
+                if (word.Length <= MAXENGWORDLENGTH)
                 {
-                    currentWordLength++;
+                    observedFreqs[word.Length - 1]++;
                 }
                 else
                 {
-                    if (currentWordLength != 0)
-                    {
-
-                        if (currentWordLength <= MAXENGWORDLENGTH)
-                        {
-                            observedFreqs[currentWordLength - 1]++;
-                        }
-                        else
-                        {
-                            observedFreqs[MAXENGWORDLENGTH]++;
-                        }
-                        currentWordLength = 0;
-                    }
+                    observedFreqs[MAXENGWORDLENGTH]++;
                 }
-            }
-            if (currentWordLength != 0 && currentWordLength <= MAXENGWORDLENGTH)
-            {
-                observedFreqs[currentWordLength - 1]++;
             }
 
             observedFreqs = Statistics.ScaleFrequencies(observedFreqs, (double) OPTIMALN);

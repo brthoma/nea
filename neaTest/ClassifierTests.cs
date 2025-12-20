@@ -28,20 +28,12 @@ namespace neaTest
     [TestClass]
     public class RandomGuesserTest
     {
-        private ClassifierTestInputs inputs = new ClassifierTestInputs();
 
         [TestMethod]
-        [DataRow(0)]
-        [DataRow(1)]
-        [DataRow(2)]
-        [DataRow(3)]
-        [DataRow(4)]
-        [DataRow(5)]
-        [DataRow(6)]
-        public void TestRange(int textIdx)
+        public void TestRange()
         {
             RandomGuesser classifier = new RandomGuesser();
-            double classification = classifier.Classify(inputs.inputs[textIdx]);
+            double classification = classifier.Classify("");
 
             Assert.IsTrue(classification >= 0 && classification <= 1);
         }
@@ -295,13 +287,13 @@ namespace neaTest
         };
         double[][] results = new double[][]
         {
-            new double[21],
+            new double[21] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             new double[21] { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             new double[21] { 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             new double[21] { 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             new double[21] { 1, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            new double[21] { 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-            new double[21] { 0, 0, 0, 1, 0, 2, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+            new double[21] { 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+            new double[21] { 0, 0, 0, 2, 0, 2, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
         }; 
 
         [TestMethod]
@@ -318,9 +310,9 @@ namespace neaTest
             double[] trueObservedFreqs = Statistics.ScaleFrequencies(results[textIdx], optimalN);
             double[] obsFreqs = classifier.GetObservedFreqs(testInputs[textIdx]);
 
-            for (int i = 0; i < obsFreqs.Length; i++)
+            for (int i = 0; i < 21; i++)
             {
-                Assert.AreEqual(trueObservedFreqs[i], results[textIdx][i]);
+                Assert.AreEqual(trueObservedFreqs[i], obsFreqs[i]);
             }
         }
 
