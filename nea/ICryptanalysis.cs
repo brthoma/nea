@@ -154,7 +154,7 @@ namespace nea
 
         /* Returns the character frequencies
          */
-        private Dictionary<char, int> GetCharCounts(string text)
+        private Dictionary<char, int> GetCharFreqs(string text)
         {
             Dictionary<char, int> textCounts = new Dictionary<char, int>();
 
@@ -175,7 +175,7 @@ namespace nea
         private double CalcIdxOfCoincidence(string textSlice)
         {
             double idxOfCoincidence = 0;
-            Dictionary<char, int> charCounts = GetCharCounts(textSlice);
+            Dictionary<char, int> charCounts = GetCharFreqs(textSlice);
 
             foreach (KeyValuePair<char, int> kvp in charCounts)
             {
@@ -301,7 +301,7 @@ namespace nea
 
         /* Finds character frequencies used for frequency analysis
          */
-        public string GetCharFreqs(string text)
+        public string GetOrderOfCharFreqs(string text)
         {
             string orderOfFreqsInText = "";
             Dictionary<char, int> freqs = new Dictionary<char, int>();
@@ -327,7 +327,7 @@ namespace nea
          */
         private string FirstGuess(string text)
         {
-            string freqsInText = GetCharFreqs(text);
+            string freqsInText = GetOrderOfCharFreqs(text);
             string key = "";
 
             foreach (char letter in ALPHABET)

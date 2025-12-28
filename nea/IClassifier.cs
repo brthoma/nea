@@ -330,7 +330,7 @@ namespace nea
             }
         }
 
-        public Dictionary<string, (double, int)> GetBigramFreqs()
+        public Dictionary<string, (double, int)> GetObservedFreqs()
         {
             return bigramsExpAndObs;
         }

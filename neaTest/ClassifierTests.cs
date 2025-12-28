@@ -240,7 +240,7 @@ namespace neaTest
 
             Dictionary<string, int> trueBigrams = inputBigrams[textIdx];
 
-            foreach (KeyValuePair<string, (double, int)> kvp in classifier.GetBigramFreqs())
+            foreach (KeyValuePair<string, (double, int)> kvp in classifier.GetObservedFreqs())
             {
                 if (trueBigrams.ContainsKey(kvp.Key))
                 {
@@ -283,7 +283,8 @@ namespace neaTest
             "hello",
             "This is a test.",
             "aaaaaaaaaaaaaaaaaaaa aaaaaaaaaa a",
-            "This classifier counts word length frequencies"
+            "This classifier counts word length frequencies",
+            "abcdefghijklmnopqrstuvwxyz"
         };
         double[][] results = new double[][]
         {
@@ -293,7 +294,8 @@ namespace neaTest
             new double[21] { 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             new double[21] { 1, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             new double[21] { 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-            new double[21] { 0, 0, 0, 2, 0, 2, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+            new double[21] { 0, 0, 0, 2, 0, 2, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            new double[21] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 }
         }; 
 
         [TestMethod]
@@ -304,6 +306,7 @@ namespace neaTest
         [DataRow(4)]
         [DataRow(5)]
         [DataRow(6)]
+        [DataRow(7)]
         public void TestProcess(int textIdx, int optimalN = 100)
         {
             WordLength classifier = new WordLength();
@@ -336,34 +339,37 @@ namespace neaTest
     [TestClass]
     public class HammingEditDistTest
     {
+        ClassifierTestInputs inputs = new ClassifierTestInputs();
+
         [TestMethod]
-        [DataRow("kerstin", 0)]
-        [DataRow("karolin", (double) 3 / 7)]
-        [DataRow("kathrin", (double) 4 / 7)]
-        [DataRow("aaaa", (double) 4 / 4)]
-        [DataRow("abdf", (double) 3 / 4)]
-        [DataRow("planet", (double) 1 / 6)]
-        [DataRow("planar", (double) 2 / 6)]
+        [DataRow("kerstin", 1)]
+        [DataRow("karolin", 0.5714285714)]
+        [DataRow("kathrin", 0.4285714286)]
+        [DataRow("aaaa", 0)]
+        [DataRow("abdf", 0.25)]
+        [DataRow("planet", 0.8333333333)]
+        [DataRow("planar", 0.6666666667)]
+        [DataRow("PLANAR", 0.6666666667)]
         public void TestProcess(string text, double expectedOutput, string dictionaryFilePath = "C:\\Users\\betha\\Code\\nea\\neaTest\\bin\\Debug\\FilesForTesting\\HammingDictionary.txt")
         {
             HammingEditDist classifier = new HammingEditDist(dictionaryFilePath);
             double classification = classifier.Classify(text);
 
-            Assert.AreEqual(1 - expectedOutput, classification, 5e-10);
+            Assert.AreEqual(expectedOutput, classification, 5e-10);
         }
 
         [TestMethod]
-        [DataRow("kerstin")]
-        [DataRow("karolin")]
-        [DataRow("kathrin")]
-        [DataRow("aaaa")]
-        [DataRow("abdf")]
-        [DataRow("planet")]
-        [DataRow("planar")]
-        public void TestRange(string text, string dictionaryFilePath = "C:\\Users\\betha\\Code\\nea\\neaTest\\bin\\Debug\\FilesForTesting\\HammingDictionary.txt")
+        [DataRow(0)]
+        [DataRow(1)]
+        [DataRow(2)]
+        [DataRow(3)]
+        [DataRow(4)]
+        [DataRow(5)]
+        [DataRow(6)]
+        public void TestRange(int textIdx, string dictionaryFilePath = "C:\\Users\\betha\\Code\\nea\\neaTest\\bin\\Debug\\FilesForTesting\\HammingDictionary.txt")
         {
             HammingEditDist classifier = new HammingEditDist(dictionaryFilePath);
-            double classification = classifier.Classify(text);
+            double classification = classifier.Classify(inputs.inputs[textIdx]);
 
             Assert.IsTrue(classification >= 0 && classification <= 1);
         }
@@ -383,20 +389,6 @@ namespace neaTest
             new IClassifier[] { new TrueClassifier(), new FalseClassifier(), new FalseClassifier() },
         };
 
-        [TestMethod]
-        [DataRow(0, 1)]
-        [DataRow(1, 0)]
-        [DataRow(2, 1)]
-        [DataRow(3, 0.5)]
-        [DataRow(4, (double) 1 / 3)]
-        private void TestProcess(int ensembleIdx, double expectedOutput)
-        {
-            MajVoting trainer = new MajVoting();
-            Ensemble classifier = new Ensemble(ensembles[ensembleIdx], trainer.GetWeights(ensembles[ensembleIdx].Length));
-            double classification = classifier.Classify("");
-
-            Assert.AreEqual(expectedOutput, classification);
-        }
 
         [TestMethod]
         [DataRow(0)]
@@ -411,6 +403,21 @@ namespace neaTest
             double classification = classifier.Classify("");
 
             Assert.IsTrue(classification >= 0 && classification <= 1);
+        }
+
+        [TestMethod]
+        [DataRow(0, 1)]
+        [DataRow(1, 0)]
+        [DataRow(2, 1)]
+        [DataRow(3, 0.5)]
+        [DataRow(4, (double) 1 / 3)]
+        public void TestProcess(int ensembleIdx, double expectedOutput)
+        {
+            MajVoting trainer = new MajVoting();
+            Ensemble classifier = new Ensemble(ensembles[ensembleIdx], trainer.GetWeights(ensembles[ensembleIdx].Length));
+            double classification = classifier.Classify("");
+
+            Assert.AreEqual(expectedOutput, classification);
         }
     }
 

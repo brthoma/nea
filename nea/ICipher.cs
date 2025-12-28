@@ -1,5 +1,6 @@
 ﻿using Microsoft.SqlServer.Server;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -35,21 +36,19 @@ namespace nea
      */
     public class XOR : ICipher
     {
-
+        private const int MIN = 'A';
+        private const int MAX = 'Z';
         private const int MAXIMUMKEYLENGTH = 6;
 
-        public byte[] GetRandomKey(Random random, int length)
+        public byte[] GetRandomKey(Random random)
         {
+            int length = random.Next(1, MAXIMUMKEYLENGTH);
             string key = "";
             for (int i = 0; i < length; i++)
             {
-                key += (char)(random.Next('A', 'Z' + 1));
+                key += (char)(random.Next(MIN, MAX + 1));
             }
             return Encoding.UTF8.GetBytes(key);
-        }
-        public byte[] GetRandomKey(Random random)
-        {
-            return GetRandomKey(random, random.Next(1, MAXIMUMKEYLENGTH));
         }
 
         public string Encrypt(string plaintext, byte[] bKey)
@@ -77,13 +76,13 @@ namespace nea
     public class ROT47 : ICipher
     {
 
-        private const int MINRANGE = 33;
-        private const int MAXRANGE = 126;
-        private const int RANGE = MAXRANGE - MINRANGE;
+        private const int MIN = 33;
+        private const int MAX = 126;
+        private const int RANGE = MAX - MIN + 1;
 
         public byte[] GetRandomKey(Random random)
         {
-            return BitConverter.GetBytes(random.Next(1, RANGE + 1));
+            return BitConverter.GetBytes(random.Next(1, RANGE));
         }
 
         public string Encrypt(string plaintext, byte[] bKey)
@@ -93,9 +92,9 @@ namespace nea
 
             foreach (char c in plaintext)
             {
-                if (c >= MINRANGE && c <= MAXRANGE)
+                if (c >= MIN && c <= MAX)
                 {
-                    ciphertext += (char)(MINRANGE + ((c - MINRANGE + key) % (RANGE + 1)));
+                    ciphertext += (char)(MIN + ((c - MIN + key) % RANGE));
                 }
                 else
                 {
@@ -108,7 +107,7 @@ namespace nea
 
         public string Decrypt(string ciphertext, byte[] bKey)
         {
-            int key = (RANGE + 1 - (BitConverter.ToInt32(bKey, 0) % (RANGE + 1))) % (RANGE + 1);
+            int key = (RANGE - (BitConverter.ToInt32(bKey, 0) % RANGE)) % RANGE;
             return Encrypt(ciphertext, BitConverter.GetBytes(key));
         }
 
@@ -118,12 +117,15 @@ namespace nea
      */
     public class ROT13 : ICipher
     {
-
-        private const int RANGE = 'z' - 'a';
+        private const int LOWERMIN = 'a';
+        private const int LOWERMAX = 'z';
+        private const int UPPERMIN = 'A';
+        private const int UPPERMAX = 'Z';
+        private const int RANGE = ('z' - 'a') + 1;
 
         public byte[] GetRandomKey(Random random)
         {
-            return BitConverter.GetBytes(random.Next(1, RANGE + 1));
+            return BitConverter.GetBytes(random.Next(1, RANGE));
         }
 
         public string Encrypt(string plaintext, byte[] bKey)
@@ -133,13 +135,13 @@ namespace nea
 
             foreach (char c in plaintext)
             {
-                if (c >= 'a' && c <= 'z')
+                if (c >= LOWERMIN && c <= LOWERMAX)
                 {
-                    ciphertext += (char)('a' + ((c - 'a' + key) % ('z' - 'a' + 1)));
+                    ciphertext += (char)(LOWERMIN + ((c - LOWERMIN + key) % RANGE));
                 }
-                else if (c >= 'A' && c <= 'Z')
+                else if (c >= UPPERMIN && c <= UPPERMAX)
                 {
-                    ciphertext += (char)('A' + ((c - 'A' + key) % ('Z' - 'A' + 1)));
+                    ciphertext += (char)(UPPERMIN + ((c - UPPERMIN + key) % RANGE));
                 }
                 else
                 {
@@ -152,7 +154,7 @@ namespace nea
 
         public string Decrypt(string ciphertext, byte[] bKey)
         {
-            int key = (RANGE + 1 - (BitConverter.ToInt32(bKey, 0) % (RANGE + 1))) % (RANGE + 1);
+            int key = (RANGE - (BitConverter.ToInt32(bKey, 0) % RANGE)) % RANGE;
             return Encrypt(ciphertext, BitConverter.GetBytes(key));
         }
 
@@ -162,23 +164,21 @@ namespace nea
      */
     public class Vigenere : ICipher
     {
-        
-        private const int RANGE = 'Z' - 'A';
+        private const int MIN = 'A';
+        private const int MAX = 'Z';
+        private const int RANGE = 'Z' - 'A' + 1;
         private const int MAXKEYLENGTH = 6;
         private const string ALPHABET = "abcdefghijklmnopqrstuvwxyz";
 
-        public byte[] GetRandomKey(Random random, int length)
+        public byte[] GetRandomKey(Random random)
         {
+            int length = random.Next(1, MAXKEYLENGTH);
             string key = "";
             for (int i = 0; i < length; i++)
             {
-                key += (char)(random.Next('A', 'Z' + 1));
+                key += (char)(random.Next(MIN, MAX + 1));
             }
             return Encoding.UTF8.GetBytes(key);
-        }
-        public byte[] GetRandomKey(Random random)
-        {
-            return GetRandomKey(random, random.Next(1, MAXKEYLENGTH));
         }
 
         public string Encrypt(string plaintext, byte[] bKey)
@@ -191,7 +191,7 @@ namespace nea
 
             for (int i = 0; i < key.Length; i++)
             {
-                keyArr[i] = key[i] - 'A';
+                keyArr[i] = key[i] - MIN;
             }
 
             int keyIdx = 0;
@@ -215,14 +215,14 @@ namespace nea
         public string Decrypt(string ciphertext, byte[] bKey)
         {
             string key = Encoding.UTF8.GetString(bKey).ToUpper();
-            string encryptKey = "";
+            string inverseKey = "";
             
             for (int i = 0; i < key.Length; i++)
             {
-                encryptKey += (char) ('A' + ((RANGE + 1 - (key[i] - 'A')) % (RANGE + 1)));
+                inverseKey += (char) (MIN + ((RANGE - (key[i] - MIN)) % RANGE));
             }
 
-            return Encrypt(ciphertext, Encoding.UTF8.GetBytes(encryptKey));
+            return Encrypt(ciphertext, Encoding.UTF8.GetBytes(inverseKey));
         }
     }
 
@@ -230,21 +230,22 @@ namespace nea
      */
     public class Substitution : ICipher
     {
-        private const int RANGE = 'z' - 'a';
+        private const int RANGE = 'z' - 'a' + 1;
+        private const int MIN = 'a';
         private const string ALPHABET = "abcdefghijklmnopqrstuvwxyz";
 
         public byte[] GetRandomKey(Random random)
         {
             string alphabet = ALPHABET;
             string key = "";
-            
-            for (int i = 0; i <= RANGE; i++)
+
+            for (int i = 0; i < RANGE; i++)
             {
                 int idxOfLetter = random.Next(alphabet.Length);
                 key += alphabet[idxOfLetter];
                 alphabet = alphabet.Remove(idxOfLetter, 1);
             }
-            
+
             return Encoding.UTF8.GetBytes(key);
         }
 
@@ -257,31 +258,41 @@ namespace nea
             {
                 if (encrypt)
                 {
-                    transformations.Add((char)(i + 97), (int)key[i] - (i + 97));
+                    transformations.Add((char)(i + MIN), (int)key[i] - (i + MIN));
                 }
                 else
                 {
-                    transformations.Add(key[i], (int)(i + 97) - key[i]);
+                    transformations.Add(key[i], (int)(i + MIN) - key[i]);
                 }
             }
 
             return transformations;
         }
 
+        private string Transform(string originalText, Dictionary<char, int> transformations)
+        {
+            string newText = "";
+
+            foreach (char c in originalText)
+            {
+                if (ALPHABET.Contains(char.ToLower(c)))
+                {
+                    newText += (char)(c + transformations[char.ToLower(c)]);
+                }
+                else
+                {
+                    newText += c;
+                }
+            }
+
+            return newText;
+        }
+
         public string Encrypt(string plaintext, byte[] bKey)
         {
             Dictionary<char, int> transformations = GetTransformations(bKey);
-            string ciphertext = "";
 
-            foreach (char c in plaintext)
-            {
-                if (!ALPHABET.Contains(char.ToLower(c)))
-                {
-                    ciphertext += c;
-                    continue;
-                }
-                ciphertext += (char) (c + transformations[char.ToLower(c)]);
-            }
+            string ciphertext = Transform(plaintext, transformations);
 
             return ciphertext;
         }
@@ -289,17 +300,8 @@ namespace nea
         public string Decrypt(string ciphertext, byte[] bKey)
         {
             Dictionary<char, int> transformations = GetTransformations(bKey, false);
-            string plaintext = "";
 
-            foreach (char c in ciphertext)
-            {
-                if (!ALPHABET.Contains(char.ToLower(c)))
-                {
-                    plaintext += c;
-                    continue;
-                }
-                plaintext += (char)(c + transformations[char.ToLower(c)]);
-            }
+            string plaintext = Transform(ciphertext, transformations);
 
             return plaintext;
         }
