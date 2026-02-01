@@ -48,12 +48,12 @@ namespace nea
         /* Combines classes until all classes have a minimum expected frequency of around 5%
          * of the sample size
          */
-        public static (double[], double[]) CombineChiSquaredClasses(double[] observedFreqs, double[] expectedFreqs, int optimalN)
+        public static (double[], double[]) CombineChiSquaredClasses(double[] observedFreqs, double[] expectedFreqs, int sumOfFreqs)
         {
             List<double> observedFreqList = observedFreqs.ToList();
             List<double> expectedFreqList = expectedFreqs.ToList();
 
-            while ((double)expectedFreqList.Min() < 0.05 * optimalN)
+            while ((double)expectedFreqList.Min() < 0.05 * sumOfFreqs)
             {
                 double minExpectedFreq = expectedFreqList.Min();
                 int removeAtIdx = expectedFreqList.IndexOf(minExpectedFreq);

@@ -149,11 +149,11 @@ namespace nea
         private const string GAMMAFUNCTLOOKUP = "C:\\Users\\betha\\Code\\nea\\FilesForUse\\LookupGammaFunct.txt";
         private const string EXPECTEDFREQUENCIES = "C:\\Users\\betha\\Code\\nea\\FilesForUse\\EnglishLetterDistribution.txt";
         private const int OPTIMALN = 100;
-        private const int LETTERSINALPHABET = 26;
+        private const int ALPHABETLENGTH = 26;
         private const int NUMINTERVALS = 1000;
         private const string ALPHABET = "abcdefghijklmnopqrstuvwxyz";
         private Dictionary<double, double> LookupGammaFunct = new Dictionary<double, double>();
-        private double[] expectedEngDistribution = new double[LETTERSINALPHABET];
+        private double[] expectedEngDistribution = new double[ALPHABETLENGTH];
         private double[] expectedFreqs;
 
         public FrequencyAnalysis()
@@ -162,15 +162,15 @@ namespace nea
 
             using (StreamReader sr = new StreamReader(EXPECTEDFREQUENCIES))
             {
-                for (int i = 0; i < LETTERSINALPHABET; i++)
+                for (int i = 0; i < ALPHABETLENGTH; i++)
                 {
                     expectedEngDistribution[i] = double.Parse(sr.ReadLine().Trim().Split('|')[1]);
                 }
                 sr.Close();
             }
 
-            expectedFreqs = new double[LETTERSINALPHABET];
-            for (int i = 0; i < LETTERSINALPHABET; i++)
+            expectedFreqs = new double[ALPHABETLENGTH];
+            for (int i = 0; i < ALPHABETLENGTH; i++)
             {
                 expectedFreqs[i] = expectedEngDistribution[i] * OPTIMALN;
             }
@@ -178,15 +178,14 @@ namespace nea
 
         public double[] GetObservedFreqs(string text)
         {
-            int numLetters = text.Count(c => ALPHABET.Contains(char.ToLower(c)));
+            double[] observedFreqs = new double[ALPHABETLENGTH];
 
-            double[] observedFreqs = new double[LETTERSINALPHABET];
-            for (int i = 0; i < LETTERSINALPHABET; i++)
+            for (int i = 0; i < ALPHABETLENGTH; i++)
             {
-                observedFreqs[i] = (double) text.Count(c => char.ToLower(c) == (char)('a' + i)) * ((double) OPTIMALN / numLetters);
+                observedFreqs[i] = text.Count(c => char.ToLower(c) == ALPHABET[i]);
             }
 
-            return observedFreqs;
+            return Statistics.ScaleFrequencies(observedFreqs, OPTIMALN);
         }
 
 
@@ -346,10 +345,10 @@ namespace nea
                     continue;
                 }
 
-                string bigram = text[i].ToString() + text[i + 1].ToString();
+                string bigram = (text[i].ToString() + text[i + 1].ToString()).ToUpper();
                 numBigrams++;
 
-                bigramsExpAndObs[bigram.ToUpper()] = (bigramsExpAndObs[bigram.ToUpper()].Item1, bigramsExpAndObs[bigram.ToUpper()].Item2 + 1);
+                bigramsExpAndObs[bigram] = (bigramsExpAndObs[bigram].Item1, bigramsExpAndObs[bigram].Item2 + 1);
             }
 
             double[] expectedFreqs = new double[NUMBIGRAMSINFILE];
@@ -393,8 +392,6 @@ namespace nea
      */
     public class Entropy : IClassifier
     {
-        private const int MINRANGE = 32;
-        private const int MAXRANGE = 126;
         private const double CLOSETOENGLISH = 4.14;
         private const double MAXENTROPY = 8.0;
 
@@ -568,13 +565,8 @@ namespace nea
                     return new Entropy();
                 case "MajorityVoteEnsemble":
                     IClassifier[] mClassifiers = new IClassifier[] { new RandomGuesser(), new ProportionPrintable(), new DictionaryLookup(), new FrequencyAnalysis(), new Bigrams(), new WordLength(), new Entropy() };
-                    MajVoting mTrainer = new MajVoting();
-                    return new Ensemble(mClassifiers, mTrainer.GetWeights(mClassifiers, cipher));
-                //case "ProportionalVoteEnsemble":
-                //    IClassifier[] pClassifiers = new IClassifier[] { new RandomGuesser(), new ProportionPrintable(), new DictionaryLookup(), new FrequencyAnalysis(), new Bigrams(), new WordLength(), new Entropy() };
-                //    string[] classifierNames = new string[] { "RandomGuesser", "ProportionPrintable", "DictionaryLookup", "FrequencyAnalysis", "Bigrams", "WordLength", "Entropy" };
-                //    ProportionalVoting pTrainer = new ProportionalVoting(classifierNames);
-                //    return new Ensemble(pClassifiers, pTrainer.GetWeights(pClassifiers, cipher));
+                    MajVoting weights = new MajVoting();
+                    return new Ensemble(mClassifiers, weights.GetWeights(mClassifiers, cipher));
                 default:
                     throw new Exception("No valid classifier selected");
             }

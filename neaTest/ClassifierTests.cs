@@ -398,8 +398,8 @@ namespace neaTest
         [DataRow(4)]
         public void TestRange(int ensembleIdx)
         {
-            MajVoting trainer = new MajVoting();
-            Ensemble classifier = new Ensemble(ensembles[ensembleIdx], trainer.GetWeights(ensembles[ensembleIdx].Length));
+            MajVoting ensemble = new MajVoting();
+            Ensemble classifier = new Ensemble(ensembles[ensembleIdx], ensemble.GetWeights(ensembles[ensembleIdx].Length));
             double classification = classifier.Classify("");
 
             Assert.IsTrue(classification >= 0 && classification <= 1);

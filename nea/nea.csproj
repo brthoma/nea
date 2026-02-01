@@ -57,9 +57,9 @@
     <Compile Include="IConfiguration.cs" />
     <Compile Include="ICryptanalysis.cs" />
     <Compile Include="IDataGenerator.cs" />
-    <Compile Include="IDisplayGraph.cs" />
-    <Compile Include="ITrainEnsemble.cs" />
-    <Compile Include="IResultsStore.cs" />
+    <Compile Include="IGraphDisplay.cs" />
+    <Compile Include="IClassifierEnsemble.cs" />
+    <Compile Include="ResultsHandlers.cs" />
     <Compile Include="IRunner.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

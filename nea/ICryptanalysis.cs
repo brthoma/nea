@@ -53,6 +53,10 @@ namespace nea
         {
             foreach (char c in text.ToLower())
             {
+                if (!char.IsLetter(c))
+                {
+                    continue;
+                }
                 if (textCounts.ContainsKey(c))
                 {
                     textCounts[c]++;
@@ -63,16 +67,13 @@ namespace nea
                 }
             }
 
-            for (int i = 0; i < textCounts.Count; i++)
-            {
-                int maxCount = textCounts.Values.Max();
-                char mostCommon = textCounts.First(kvp => kvp.Value == maxCount).Key;
+            int maxCount = textCounts.Values.Max();
+            char mostCommon = textCounts.First(kvp => kvp.Value == maxCount).Key;
 
-                foreach (char nextLikelyPlain in ORDEROFCHECK)
-                {
-                    int possibleKey = ((mostCommon - nextLikelyPlain) % (ROT13RANGE + 1) + ROT13RANGE + 1) % (ROT13RANGE + 1);
-                    yield return BitConverter.GetBytes(possibleKey);
-                }
+            foreach (char nextLikelyPlain in ORDEROFCHECK)
+            {
+                int possibleKey = ((mostCommon - nextLikelyPlain) % (ROT13RANGE + 1) + ROT13RANGE + 1) % (ROT13RANGE + 1);
+                yield return BitConverter.GetBytes(possibleKey);
             }
 
         }
@@ -131,6 +132,7 @@ namespace nea
     {
         private const double IOCTHRESHOLD = 1.5;
         private const int MAXKEYLENGTH = 6;
+        private const int ATTEMPTS = 10;
         private const string ALPHABET = "abcdefghijklmnopqrstuvwxyz";
 
         /* Splits text into slices
@@ -189,20 +191,20 @@ namespace nea
          */
         private IEnumerable<(int, string[])> GetLikelyKeyLength(string text)
         {
-            for (int i = 1; i < MAXKEYLENGTH; i++)
+            for (int keyLength = 1; keyLength < MAXKEYLENGTH; keyLength++)
             {
                 double totalIoC = 0;
 
-                string[] slices = GetSlices(text, i);
+                string[] slices = GetSlices(text, keyLength);
 
                 foreach (string slice in slices)
                 {
                     totalIoC += CalcIdxOfCoincidence(slice);
                 }
 
-                if (totalIoC / i > IOCTHRESHOLD)
+                if (totalIoC / keyLength > IOCTHRESHOLD)
                 {
-                    yield return (i, slices);
+                    yield return (keyLength, slices);
                 }
             }
 
@@ -210,29 +212,30 @@ namespace nea
 
         /* Cycles through likely keys for a single slice
          */
-        private IEnumerable<int> GetSingleKey(string slice, int attempts = 26)
+        private IEnumerable<char> GetSingleKey(string slice)
         {
-            ROT13 cipher = new ROT13();
-            FrequencyAnalysis freqAnalysis = new FrequencyAnalysis();
+            Vigenere cipher = new Vigenere();
+            IClassifier classifier = new FrequencyAnalysis();
 
-            List<int> keys = new List<int>();
-            List<double> pvalues = new List<double>();
+            List<char> keys = new List<char>();
+            List<double> classifications = new List<double>();
 
-            for(int i = 0; i < 26; i++)
+            for (char c = 'A'; c <= 'Z'; c++)
             {
-                double pvalue = freqAnalysis.Classify(cipher.Decrypt(slice, BitConverter.GetBytes(i)));
-                keys.Add(i);
-                pvalues.Add(pvalue);
+                double classifierOutput = classifier.Classify(cipher.Decrypt(slice, BitConverter.GetBytes(c)));
+                keys.Add(c);
+                classifications.Add(classifierOutput);
             }
-            for (int i = 0; i < attempts; i++)
+            for (int i = 0; i < ATTEMPTS; i++)
             {
-                int idx = pvalues.IndexOf(pvalues.Max());
-                int key = keys[idx];
-                pvalues.RemoveAt(idx);
+                int idx = classifications.IndexOf(classifications.Max());
+                char key = keys[idx];
+                classifications.RemoveAt(idx);
                 keys.RemoveAt(idx);
                 yield return key;
             }
         }
+
 
         /* Recursive function which cycles through possible keys for a given key length
          * Increments keys in order of plausibility according to frequency analysis from rightmost to leftmost
@@ -240,10 +243,8 @@ namespace nea
         private IEnumerable<string> Cycle(int keyLength, int idxInKey, string key, string[] slices)
         {
 
-            foreach (int intKeyChar in GetSingleKey(slices[idxInKey], 10))
+            foreach (char keyChar in GetSingleKey(slices[idxInKey]))
             {
-                char keyChar = (char)((intKeyChar % 26 + 26) % 26 + 'A');
-
                 if (idxInKey == keyLength - 1)
                 {
                     yield return key + keyChar;
@@ -366,13 +367,13 @@ namespace nea
         {
             string key = FirstGuess(text);
 
-            string decryptedText = cipher.Decrypt(text, Encoding.UTF8.GetBytes(key));
-            double classification = classifier.Classify(decryptedText);
+            string decrypted = cipher.Decrypt(text, Encoding.UTF8.GetBytes(key));
+            double classification = classifier.Classify(decrypted);
 
             for (int i = 0; i < NUMBEROFSWAPS; i++)
             {
                 string newKey = RandomSwap(key, random);
-                string decrypted = cipher.Decrypt(text, Encoding.UTF8.GetBytes(newKey));
+                decrypted = cipher.Decrypt(text, Encoding.UTF8.GetBytes(newKey));
                 double newClassification = classifier.Classify(decrypted);
 
                 if (newClassification > classification)
@@ -396,8 +397,9 @@ namespace nea
      */
     public class XORCryptanalysis : ICryptanalysis
     {
-        private const double IOCTHRESHOLD = 0.06; //This is ~ 1.5 / 26 but will need to justify this in writeup
-        private const int MAXKEYLENGTH = 6; //also try to maybe justify
+        private const double IOCTHRESHOLD = 1.5;
+        private const int MAXKEYLENGTH = 6;
+        private const int ATTEMPTS = 10;
 
         /* Splits the text up into slices
          */
@@ -443,7 +445,7 @@ namespace nea
                 idxOfCoincidence += (double)kvp.Value * (kvp.Value - 1) / (textSlice.Length * (textSlice.Length - 1));
             }
 
-            return idxOfCoincidence;
+            return idxOfCoincidence * 26;
         }
 
         /* Uses Index of Coincidence to estimate the key length
@@ -453,23 +455,23 @@ namespace nea
             List<int> keyLengths = new List<int>();
             List<double> IoCValues = new List<double>();
 
-            for (int i = 1; i < MAXKEYLENGTH; i++)
+            for (int keyLength = 1; keyLength < MAXKEYLENGTH; keyLength++)
             {
                 double totalIoC = 0;
 
-                string[] slices = GetSlices(text, i);
+                string[] slices = GetSlices(text, keyLength);
 
                 foreach (string slice in slices)
                 {
                     totalIoC += CalcIdxOfCoincidence(slice);
                 }
 
-                keyLengths.Add(i);
-                IoCValues.Add(totalIoC / i);
+                keyLengths.Add(keyLength);
+                IoCValues.Add(totalIoC / keyLength);
 
-                if (totalIoC / i > IOCTHRESHOLD)
+                if (totalIoC / keyLength > IOCTHRESHOLD)
                 {
-                    yield return (i, slices);
+                    yield return (keyLength, slices);
                 }
             }
 
@@ -483,37 +485,37 @@ namespace nea
             }
         }
 
-        /* Recursive function which cycles through likely keys for a single key character
+        /* Cycles through likely keys for a single key character
          */
-        private IEnumerable<char> GetSingleKey(string slice, int attempts = 26)
+        private IEnumerable<char> GetSingleKey(string slice)
         {
             XOR cipher = new XOR();
             IClassifier classifier = new FrequencyAnalysis();
 
             List<char> keys = new List<char>();
-            List<double> pvalues = new List<double>();
+            List<double> classifications = new List<double>();
 
             for (char c = 'A'; c <= 'Z'; c++)
             {
-                double pvalue = classifier.Classify(cipher.Decrypt(slice, BitConverter.GetBytes(c)));
+                double classifierOutput = classifier.Classify(cipher.Decrypt(slice, BitConverter.GetBytes(c)));
                 keys.Add(c);
-                pvalues.Add(pvalue);
+                classifications.Add(classifierOutput);
             }
-            for (int i = 0; i < attempts; i++)
+            for (int i = 0; i < ATTEMPTS; i++)
             {
-                int idx = pvalues.IndexOf(pvalues.Max());
+                int idx = classifications.IndexOf(classifications.Max());
                 char key = keys[idx];
-                pvalues.RemoveAt(idx);
+                classifications.RemoveAt(idx);
                 keys.RemoveAt(idx);
                 yield return key;
             }
         }
 
-        /* Cycles through possible keys for a particular key length
+        /* Recursive function which cycles through possible keys for a particular key length
          */
         private IEnumerable<string> Cycle(int keyLength, int idxInKey, string key, string[] slices)
         {
-            foreach (char keyChar in GetSingleKey(slices[idxInKey], 10))
+            foreach (char keyChar in GetSingleKey(slices[idxInKey]))
             {
                 if (idxInKey == keyLength - 1)
                 {

@@ -35,7 +35,7 @@ namespace nea
         {
             Random random = new Random();
 
-            TestResultsStore resultsStore = new TestResultsStore();
+            TestResultsHandler resultsStore = new TestResultsHandler();
 
             IDataGenerator dataGenerator = DataGeneratorFactory.GetDataGenerator(config.GetStr("dataGenerator"));
             ICipher cipher = CipherFactory.GetCipher(config.GetStr("cipher"));
@@ -92,7 +92,7 @@ namespace nea
         {
             Random random = new Random();
 
-            DemoResultsStore resultsStore = new DemoResultsStore();
+            DemoResultsHandler resultsStore = new DemoResultsHandler();
 
             IDataGenerator dataGenerator = DataGeneratorFactory.GetDataGenerator(config.GetStr("dataGenerator"));
             ICipher cipher = CipherFactory.GetCipher(config.GetStr("cipher"));
@@ -123,10 +123,8 @@ namespace nea
                     {
                         Console.WriteLine("GUESS:");
                         Console.WriteLine(likelyPlaintext);
-                        Console.WriteLine();
                         Console.WriteLine("CIPHERTEXT:");
                         Console.WriteLine(ciphertext);
-                        Console.WriteLine();
 
                         if (likelyPlaintext.ToLower() == plaintext.ToLower())
                         {
@@ -136,6 +134,7 @@ namespace nea
                     }
                 }
                 Console.WriteLine($"Success: {success[i]}");
+                Console.WriteLine();
             }
 
             resultsStore.SaveResults(config, success);
@@ -148,17 +147,16 @@ namespace nea
     /* View Test Results Runner
      * Reads in the test results from a text file
      * Visually displays the results of the test to the user
-     * Displays 3 graphs to the user:
+     * Displays 2 graphs to the user:
      * - Threshold-success
      * - ROC curve
-     * - DET curve
      * Multiple sets of test results can be viewed at once
      */
     public class ViewTestResultsRunner : IRunner
     {
         public void Run(IConfiguration config)
         {
-            TestResultsStore resultsStore = new TestResultsStore();
+            TestResultsHandler resultsStore = new TestResultsHandler();
             ThresholdSuccessGraph thresholdSuccessGraph = new ThresholdSuccessGraph();
             ROCCurve rocCurve = new ROCCurve();
 

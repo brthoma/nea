@@ -62,7 +62,7 @@ namespace nea
                         break;
 
                     case "View classifier test results":
-                        TestResultsStore testResultsStore = new TestResultsStore();
+                        TestResultsHandler testResultsStore = new TestResultsHandler();
                         ViewTestResultsRunner viewTestResultsRunner = new ViewTestResultsRunner();
 
                         string[] testsInfo = UI.GetChoices(
@@ -82,7 +82,7 @@ namespace nea
                         break;
 
                     case "View demonstration results":
-                        DemoResultsStore demoResultsStore = new DemoResultsStore();
+                        DemoResultsHandler demoResultsStore = new DemoResultsHandler();
                         ViewDemoResultsRunner viewDemoResultsRunner = new ViewDemoResultsRunner();
 
                         string[] demoInfo = UI.GetChoices(
